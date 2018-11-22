@@ -4,7 +4,7 @@ const LabArchivesController = require('./api/controllers/LabArchivesController')
 const LabArchivesService = require('./api/services/LabArchivesService');
 const recordTypeConfig = require('./config/recordtype.js');
 const workflowConfig = require('./config/workflow.js');
-const recordFormConfig = require('./form-config/template-1.0-draft.js');
+const recordFormConfig = require('./form-config/labarchives-1.0-draft.js');
 
 module.exports = function (sails) {
   return {
