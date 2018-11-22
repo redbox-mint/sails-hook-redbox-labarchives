@@ -1,5 +1,5 @@
 module.exports.recordtype = {
-  "template": {
+  "labarchives": {
     "packageType": "workspace",
     searchFilters: [
       {

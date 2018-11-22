@@ -2,8 +2,8 @@
  * Template form
  */
 module.exports = {
-  name: 'template-1.0-draft',
-  type: 'template',
+  name: 'labarchives-1.0-draft',
+  type: 'labarchives',
   skipValidationOnSave: true,
   editCssClasses: 'row col-md-12',
   viewCssClasses: 'row col-md-offset-1 col-md-10',

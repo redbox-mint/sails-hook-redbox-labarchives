@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const TemplateController = require('./api/controllers/TemplateController');
-const TemplateService = require('./api/services/TemplateService');
+const LabArchivesController = require('./api/controllers/LabArchivesController');
+const LabArchivesService = require('./api/services/LabArchivesService');
 const recordTypeConfig = require('./config/recordtype.js');
 const workflowConfig = require('./config/workflow.js');
 const recordFormConfig = require('./form-config/template-1.0-draft.js');
@@ -17,14 +17,14 @@ module.exports = function (sails) {
     routes: {
       before: {},
       after: {
-        'get /:branding/:portal/ws/template/hello': TemplateController.helloWorld
+        'get /:branding/:portal/ws/labarchives/hello': LabArchivesController.helloWorld
       }
     },
     configure: function () {
-      sails.services['TemplateService'] = TemplateService;
+      sails.services['LabArchivesService'] = LabArchivesService;
       sails.config = _.merge(sails.config, recordTypeConfig);
       sails.config = _.merge(sails.config, workflowConfig);
-      sails.config['form']['forms'] = _.merge(sails.config['form']['forms'], {'template-1.0-draft': recordFormConfig});
+      sails.config['form']['forms'] = _.merge(sails.config['form']['forms'], {'labarchives-1.0-draft': recordFormConfig});
     }
   }
 };

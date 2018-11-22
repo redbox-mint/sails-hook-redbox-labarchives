@@ -2,7 +2,7 @@ const Sails = require('sails').Sails;
 const assert = require('assert');
 var supertest = require('supertest');
 
-const TemplateService = require('../api/services/TemplateService');
+const LabArchivesService = require('../api/services/LabArchivesService');
 
 describe('Basic tests ::', function () {
 
@@ -18,7 +18,7 @@ describe('Basic tests ::', function () {
     Sails().lift({
       hooks: {
         // Load the hook
-        "sails-hook-redbox-template": require('../'),
+        "sails-hook-redbox-labarchives": require('../'),
         // Skip grunt (unless your hook uses it)
         "grunt": false
       },
@@ -32,19 +32,19 @@ describe('Basic tests ::', function () {
   });
 
   it('should have a service', function (done) {
-    assert.equal(sails.services['TemplateService'].helloWorld(), 'Hello World');
+    assert.equal(sails.services['LabArchivesService'].helloWorld(), 'Hello World');
     done();
   });
 
   it('should have a form', function (done) {
-    const type = sails.config['form']['forms']['template-1.0-draft']['type'];
-    assert.equal(type, 'template');
+    const type = sails.config['form']['forms']['labarchives-1.0-draft']['type'];
+    assert.equal(type, 'labarchives');
     done();
   });
 
   it('should have a route', function (done) {
     supertest(sails.hooks.http.app)
-      .get('/:branding/:portal/ws/template/hello')
+      .get('/:branding/:portal/ws/labarchives/hello')
       .expect(200)
       .end(function (err, res) {
         assert.equal(res.text, 'Hello World');

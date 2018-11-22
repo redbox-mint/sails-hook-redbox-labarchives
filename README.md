@@ -1,6 +1,5 @@
-## A Sails Hook Redbox Template
+## A Sails Hook Redbox LabArchives
 
-In this example template you will find the barebones requirements for a Hook
 
 This Project is divided between folders
 
@@ -18,7 +17,7 @@ If you require to have a form in your portal
 
 - `config/recordtype`
 - `config/workflow`
-- `form-config/template-1.0-draft`
+- `form-config/labarchives-1.0-draft`
 
 ## index
 
@@ -55,7 +54,7 @@ It may cause your application to not lift.
 ```sh
 $ npm test
 
-> @uts-eresearch/sails-hook-redbox-template@1.0.0 test /Users/moises/source/code.research/sails-hook-redbox-template
+> @uts-eresearch/sails-hook-redbox-labarchives@1.0.0 test /Users/moises/source/code.research/sails-hook-redbox-labarchives
 > NODE_ENV=test node_modules/.bin/mocha
 
 
@@ -89,7 +88,7 @@ npm link into redbox-portal
 
 ```bash
 cd /into/redbox-portal/
-npm link sails-hook-redbox-gitlab
+npm link sails-hook-redbox-labarchives
 ```
 
 ## Vagrant/Docker
@@ -105,7 +104,7 @@ In the `docker-compose.yml` file in redbox-portal verify that the service has th
 For Vagrant to place the code inside of the same machine/docker. You can share it via the VagrantFile using sync_folder
 
 ```yml
-  config.vm.synced_folder "/Users/moises/source/qcif/sails-hook-redbox-template", "/opt/hooks/sails-hook-redbox-template", id: "template"
+  config.vm.synced_folder "/Users/moises/source/qcif/sails-hook-redbox-labarchives", "/opt/hooks/sails-hook-redbox-labarchives", id: "labarchives"
 ```
 
 Now inside the docker instance of redbox-portal link the hook and your redbox-portal
@@ -117,7 +116,7 @@ docker exec -it redbox-portal_redboxportal_1 /bin/bash
 run npm link in the hook folder
 
 ```bash
-cd /opt/hooks/sails-hook-redbox-template
+cd /opt/hooks/sails-hook-redbox-labarchives
 npm link
 
 ```
@@ -126,6 +125,6 @@ now link this alias in your redbox-portal
 
 ```bash
 cd /opt/redbox-portal
-npm link sails-hook-redbox-template
+npm link sails-hook-redbox-labarchives
 ```
 
