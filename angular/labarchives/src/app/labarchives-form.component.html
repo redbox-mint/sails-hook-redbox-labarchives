@@ -1,0 +1,13 @@
+<div class="container-fluid">
+  <h2>LabNotebooks</h2>
+  <div *ngIf="!user.loggedIn" class="row">
+    <div class="col-md-5 col-md-offset-2">
+      <labarchives-login (user)="user" (userLogin)="loginUser($event)"></labarchives-login>
+    </div>
+  </div>
+  <div *ngIf="user.loggedIn" class="row">
+    <div class="col-lg-10">
+      <labarchives-list ([user])="user"></labarchives-list>
+    </div>
+  </div>
+</div>
