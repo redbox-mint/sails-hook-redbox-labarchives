@@ -8414,6 +8414,7 @@ var LabarchivesListField = /** @class */ (function (_super) {
         _this.accessDeniedObjects = [];
         _this.failedObjects = [];
         _this.columns = [
+            { 'show': false, 'property': 'id' },
             { 'label': 'Name', 'property': 'name' },
             { 'label': 'Description', 'property': 'description' },
             { 'label': 'Location', 'property': 'web_url', 'link': 'true' }
@@ -8422,17 +8423,30 @@ var LabarchivesListField = /** @class */ (function (_super) {
         _this.syncLabel = 'Sync';
         return _this;
     }
-    LabarchivesListField.prototype.listWorkspaces = function () {
-        return [
-            { name: 'notebook', description: 'notebook description', web_url: 'the route of the notebook', rdmp: { info: '' } },
-            { name: 'notebook2', description: 'notebook description 2 ', web_url: 'the route of the notebook', rdmp: { info: '' } }
-        ];
+    LabarchivesListField.prototype.registerEvents = function () {
+        this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
+    };
+    LabarchivesListField.prototype.listWorkspaces = function (labUser) {
+        var notebooks = labUser['notebooks'];
+        if (notebooks && notebooks['notebook']) {
+            var nbs = notebooks['notebook'];
+            console.log(nbs);
+            this.workspaces = nbs.map(function (nb) {
+                var isDefault = nb['is-default'];
+                return {
+                    name: nb['name'],
+                    description: isDefault._ !== 'false' ? 'default' : '',
+                    web_url: '',
+                    rdmp: { info: '', id: nb['id'] }
+                };
+            });
+        }
+        else {
+            this.workspaces = [];
+        }
     };
     LabarchivesListField.prototype.linkWorkspace = function (item) {
         alert('linking');
-    };
-    LabarchivesListField.prototype.init = function () {
-        this.workspaces = this.listWorkspaces();
     };
     __decorate([
         core_1.Input(),
@@ -8447,12 +8461,12 @@ var LabarchivesListComponent = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     LabarchivesListComponent.prototype.ngOnInit = function () {
-        this.field.init();
+        this.field.registerEvents();
     };
     LabarchivesListComponent = __decorate([
         core_1.Component({
             selector: 'ws-labarchiveslist',
-            template: "\n    <div class=\"\">\n      <table class=\"table\">\n        <thead>\n        <tr>\n          <ng-container *ngFor=\"let header of field.columns\">\n            <th>{{ header.label }}</th>\n          </ng-container>\n          <th>{{ field.rdmpLinkLabel }}</th>\n        </tr>\n        </thead>\n        <tbody>\n        <tr *ngFor=\"let item of field.workspaces\">\n          <ng-container *ngFor=\"let column of field.columns\">\n            <td *ngIf=\"column.show != false\">\n                <span *ngIf=\"column.link; else noProcessing \"><a target=\"_blank\" rel=\"noopener noreferrer\"\n                                                                 href=\"{{ item[column.property] }}\">{{ item[column.property]\n                  }}</a></span>\n              <ng-template #multivalue></ng-template>\n              <ng-template #noProcessing><span>{{ item[column.property] }}</span></ng-template>\n            </td>\n          </ng-container>\n          <td>\n            <span *ngIf=\"item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked \">\n              <button disabled type=\"button\" class=\"btn btn-success btn-block\"\n                      *ngIf=\"item.rdmp.info.rdmp === field.rdmp\"> Linked </button>\n              <button disabled type=\"button\" class=\"btn btn-info btn-block\" *ngIf=\"item.rdmp.info.rdmp != field.rdmp\"> Linked to another RDMP</button>\n            </span>\n            <ng-template #isNotLinked>\n              <button type=\"button\" class=\"btn btn-info btn-block\" (click)=\"field.linkWorkspace(item)\"> Link</button>\n            </ng-template>\n          </td>\n        </tr>\n        </tbody>\n      </table>\n      <div *ngIf=\"field.loading\" class=\"\">\n        <img class=\"center-block\" src=\"/images/loading.svg\">\n      </div>\n      <p *ngIf=\"field.failedObjects.length > 0\">There were {{ field.failedObjects.length }} records that failed to\n        load</p>\n      <p *ngIf=\"field.accessDeniedObjects.length > 0\">There were {{ field.accessDeniedObjects.length }} records that\n        you do not have access to</p>\n      <div class=\"\">\n        <button type=\"button\" class=\"btn btn-default\" (click)=\"field.listWorkspaces()\"><i\n          class=\"fa fa-refresh\"></i>&nbsp;{{ field.syncLabel }}\n        </button>\n      </div>\n      <div>\n        <p></p>\n      </div>\n    </div>\n  "
+            template: "\n    <div class=\"row\">\n      <div class=\"col-lg-10\">\n        <div class=\"\">\n          <table class=\"table\">\n            <thead>\n            <tr>\n              <ng-container *ngFor=\"let header of field.columns\">\n                <th>{{ header.label }}</th>\n              </ng-container>\n              <th>{{ field.rdmpLinkLabel }}</th>\n            </tr>\n            </thead>\n            <tbody>\n            <tr *ngFor=\"let item of field.workspaces\">\n              <ng-container *ngFor=\"let column of field.columns\">\n                <td *ngIf=\"column.show != false\">\n                <span *ngIf=\"column.link; else noProcessing \">\n                  <a target=\"_blank\" rel=\"noopener noreferrer\"\n                     href=\"{{ item[column.property] }}\">{{ item[column.property]}}</a>\n                </span>\n                  <ng-template #multivalue></ng-template>\n                  <ng-template #noProcessing><span>{{ item[column.property] }}</span></ng-template>\n                </td>\n              </ng-container>\n              <td>\n            <span *ngIf=\"item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked \">\n              <button disabled type=\"button\" class=\"btn btn-success btn-block\"\n                      *ngIf=\"item.rdmp.info.rdmp === field.rdmp\"> Linked </button>\n              <button disabled type=\"button\" class=\"btn btn-info btn-block\" *ngIf=\"item.rdmp.info.rdmp != field.rdmp\"> Linked to another RDMP</button>\n            </span>\n                <ng-template #isNotLinked>\n                  <button type=\"button\" class=\"btn btn-info btn-block\" (click)=\"field.linkWorkspace(item)\"> Link\n                  </button>\n                </ng-template>\n              </td>\n            </tr>\n            </tbody>\n          </table>\n          <div *ngIf=\"field.loading\" class=\"\">\n            <img class=\"center-block\" src=\"/images/loading.svg\">\n          </div>\n          <p *ngIf=\"field.failedObjects.length > 0\">There were {{ field.failedObjects.length }} records that failed to\n            load</p>\n          <p *ngIf=\"field.accessDeniedObjects.length > 0\">There were {{ field.accessDeniedObjects.length }} records that\n            you do not have access to</p>\n          <div class=\"\">\n            <button type=\"button\" class=\"btn btn-default\" (click)=\"field.listWorkspaces()\"><i\n              class=\"fa fa-refresh\"></i>&nbsp;{{ field.syncLabel }}\n            </button>\n          </div>\n          <div>\n            <p></p>\n          </div>\n        </div>\n      </div>\n    </div>\n  "
         })
     ], LabarchivesListComponent);
     return LabarchivesListComponent;
@@ -8486,10 +8500,46 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
 var field_simple_component_1 = __webpack_require__("./redbox-portal/angular/shared/form/field-simple.component.ts");
 var field_base_1 = __webpack_require__("./redbox-portal/angular/shared/form/field-base.ts");
+var labarchives_service_1 = __webpack_require__("./src/app/labarchives.service.ts");
 var LabarchivesLoginField = /** @class */ (function (_super) {
     __extends(LabarchivesLoginField, _super);
     function LabarchivesLoginField(options, injector) {
@@ -8498,17 +8548,50 @@ var LabarchivesLoginField = /** @class */ (function (_super) {
         _this.usernameLabel = 'Username';
         _this.passwordLabel = 'Password';
         _this.submitted = false;
+        _this.errorMessage = undefined;
         _this.userLogin = new core_1.EventEmitter();
+        _this.labarchivesService = _this.getFromInjector(labarchives_service_1.LabarchivesService);
         return _this;
     }
-    LabarchivesLoginField.prototype.onSubmit = function () {
-        this.user = { username: this.username, password: this.password };
-        this.user.loggedIn = true;
-        this.userLogin.emit(this.user);
-        this.submitted = true;
+    LabarchivesLoginField.prototype.login = function (form) {
+        return __awaiter(this, void 0, void 0, function () {
+            var formValid, login;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        formValid = this.loginValid(form);
+                        if (!(formValid === '')) return [3 /*break*/, 2];
+                        // TODO: Investigate this. Using this method to remove the trailing Base64 equals ==
+                        form.password = form.password.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+                        this.user = { username: form.username, password: form.password };
+                        return [4 /*yield*/, this.labarchivesService.login(this.user.username, this.user.password)];
+                    case 1:
+                        login = _a.sent();
+                        if (login.status) {
+                            this.user.loggedIn = true;
+                            this.userLogin.emit(login.labUser);
+                            this.submitted = true;
+                        }
+                        else {
+                            this.errorMessage = login.message;
+                        }
+                        return [3 /*break*/, 3];
+                    case 2:
+                        this.errorMessage = formValid;
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
     };
-    LabarchivesLoginField.prototype.userIsValid = function () {
-        return true;
+    LabarchivesLoginField.prototype.loginValid = function (form) {
+        if (!form.username) {
+            return 'Please include username';
+        }
+        if (!form.password) {
+            return 'Please include username';
+        }
+        return '';
     };
     __decorate([
         core_1.Output(),
@@ -8527,7 +8610,7 @@ var LabarchivesLoginComponent = /** @class */ (function (_super) {
     LabarchivesLoginComponent = __decorate([
         core_1.Component({
             selector: 'ws-labarchiveslogin',
-            template: "\n    <form (ngSubmit)=\"field.onSubmit()\" #form=\"ngForm\">\n      <div class=\"form-group\">\n        <label>{{ field.usernameLabel }}</label>\n        <input type=\"text\" class=\"form-control\" ngModel name=\"username\"\n               attr.aria-label=\"{{ field.usernameLabel }}\">\n      </div>\n      <div class=\"form-group\">\n        <label>{{ field.passwordLabel }}</label>\n        <input type=\"password\" class=\"form-control\" ngModel name=\"password\"\n               attr.aria-label=\"{{ field.passwordLabel }}\">\n      </div>\n      <div class=\"form-row\">\n        <button type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">Login</button>\n      </div>\n      <div>\n        <p></p>\n      </div>\n      <div class=\"form-group\">\n        <button type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">Login trough UTS</button>\n      </div>\n      <div class=\"errorMessage\" *ngIf=\"!field.valid\">Field is required</div>\n      <div>\n        <p></p>\n      </div>\n    </form>\n  "
+            template: "\n    <div class=\"row\">\n      <div class=\"col-md-5 col-md-offset-2\">\n        <form #form=\"ngForm\">\n          <div class=\"form-group\">\n            <label>{{ field.usernameLabel }}</label>\n            <input type=\"text\" class=\"form-control\" ngModel name=\"username\"\n                   attr.aria-label=\"{{ field.usernameLabel }}\">\n          </div>\n          <div class=\"form-group\">\n            <label>{{ field.passwordLabel }}</label>\n            <input type=\"password\" class=\"form-control\" ngModel name=\"password\"\n                   attr.aria-label=\"{{ field.passwordLabel }}\">\n          </div>\n          <div class=\"form-row\">\n            <button (click)=\"field.login(form.value)\" type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">\n              Login\n            </button>\n          </div>\n          <div>\n            <p>or</p>\n          </div>\n          <div class=\"form-group\">\n            <button type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">Login trough UTS</button>\n          </div>\n          <div class=\"alert alert-danger\" *ngIf=\"field.errorMessage\">{{ field.errorMessage }}</div>\n          <div>\n            <p></p>\n          </div>\n        </form>\n      </div>\n    </div>\n  "
         })
     ], LabarchivesLoginComponent);
     return LabarchivesLoginComponent;
@@ -8732,6 +8815,7 @@ var platform_browser_1 = __webpack_require__("./node_modules/@angular/platform-b
 var forms_1 = __webpack_require__("./node_modules/@angular/forms/esm5/forms.js");
 var core_1 = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
 var shared_module_1 = __webpack_require__("./redbox-portal/angular/shared/shared.module.ts");
+var labarchives_service_1 = __webpack_require__("./src/app/labarchives.service.ts");
 var labarchives_form_component_1 = __webpack_require__("./src/app/labarchives-form.component.ts");
 var labarchives_login_component_1 = __webpack_require__("./src/app/components/labarchives-login.component.ts");
 var labarchives_list_component_1 = __webpack_require__("./src/app/components/labarchives-list.component.ts");
@@ -8747,7 +8831,9 @@ var LabarchivesModule = /** @class */ (function () {
                 labarchives_form_component_1.LabarchivesFormComponent, labarchives_login_component_1.LabarchivesLoginComponent, labarchives_list_component_1.LabarchivesListComponent
             ],
             exports: [],
-            providers: [],
+            providers: [
+                labarchives_service_1.LabarchivesService
+            ],
             bootstrap: [
                 labarchives_form_component_1.LabarchivesFormComponent
             ],
@@ -8759,6 +8845,176 @@ var LabarchivesModule = /** @class */ (function () {
     return LabarchivesModule;
 }());
 exports.LabarchivesModule = LabarchivesModule;
+
+
+/***/ }),
+
+/***/ "./src/app/labarchives.service.ts":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
+var Subject_1 = __webpack_require__("./node_modules/rxjs/_esm5/Subject.js");
+var http_1 = __webpack_require__("./node_modules/@angular/http/esm5/http.js");
+__webpack_require__("./node_modules/rxjs/_esm5/add/operator/toPromise.js");
+__webpack_require__("./node_modules/rxjs/_esm5/add/operator/delay.js");
+var base_service_1 = __webpack_require__("./redbox-portal/angular/shared/base-service.ts");
+var config_service_1 = __webpack_require__("./redbox-portal/angular/shared/config-service.ts");
+var LabarchivesService = /** @class */ (function (_super) {
+    __extends(LabarchivesService, _super);
+    function LabarchivesService(http, configService) {
+        var _this = _super.call(this, http, configService) || this;
+        _this.configService = configService;
+        _this.recordURL = _this.brandingAndPortalUrl + '/record/view';
+        _this.initSubject = new Subject_1.Subject();
+        _this.emitInit();
+        return _this;
+    }
+    LabarchivesService.prototype.waitForInit = function (handler) {
+        var subs = this.initSubject.subscribe(handler);
+        this.emitInit();
+        return subs;
+    };
+    LabarchivesService.prototype.emitInit = function () {
+        if (this.brandingAndPortalUrl) {
+            this.initSubject.next('');
+        }
+    };
+    LabarchivesService.prototype.login = function (username, password) {
+        return __awaiter(this, void 0, void 0, function () {
+            var wsUrl, result, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/login';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.http.post(wsUrl, { username: username, password: password }, this.options).toPromise()];
+                    case 2:
+                        result = _a.sent();
+                        return [2 /*return*/, Promise.resolve(this.extractData(result))];
+                    case 3:
+                        e_1 = _a.sent();
+                        return [2 /*return*/, Promise.reject(new Error(e_1))];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    LabarchivesService.prototype.createRequest = function (request, rdmpId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var wsUrl, result, e_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/create';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.http.post(wsUrl, { request: request, rdmp: rdmpId }, this.options).toPromise()];
+                    case 2:
+                        result = _a.sent();
+                        return [2 /*return*/, Promise.resolve(this.extractData(result))];
+                    case 3:
+                        e_2 = _a.sent();
+                        return [2 /*return*/, Promise.reject(new Error(e_2))];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    LabarchivesService.prototype.getUserInfo = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var wsUrl, result, e_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        wsUrl = this.brandingAndPortalUrl + '/user/info';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.http.get(wsUrl, this.options).toPromise()];
+                    case 2:
+                        result = _a.sent();
+                        return [2 /*return*/, Promise.resolve((this.extractData(result)))];
+                    case 3:
+                        e_3 = _a.sent();
+                        return [2 /*return*/, Promise.reject(new Error(e_3))];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    LabarchivesService = __decorate([
+        core_1.Injectable(),
+        __param(0, core_1.Inject(http_1.Http)),
+        __param(1, core_1.Inject(config_service_1.ConfigService)),
+        __metadata("design:paramtypes", [http_1.Http,
+            config_service_1.ConfigService])
+    ], LabarchivesService);
+    return LabarchivesService;
+}(base_service_1.BaseService));
+exports.LabarchivesService = LabarchivesService;
 
 
 /***/ }),

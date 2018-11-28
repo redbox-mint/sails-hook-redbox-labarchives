@@ -1,5 +1,5 @@
 {
-  "name": "@uts-eresearch/sails-hook-redbox-labarchives",
+  "name": "sails-hook-redbox-labarchives",
   "version": "1.0.0",
   "description": "A Sails Hook for LabArchives",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "hookName": "labarchives"
   },
   "scripts": {
-    "test": "NODE_ENV=test node_modules/.bin/mocha"
+    "test": "NODE_ENV=test node_modules/.bin/mocha",
+    "compile": "node_modules/.bin/tsc --project tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -23,11 +24,20 @@
   "author": "Moises Sacal",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@types/lodash": "^4.14.118",
     "mocha": "^5.1.1",
     "sails": "^1.0.2",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "typescript": "^2.9.2"
   },
   "dependencies": {
-    "lodash": "^4.17.10"
+    "@uts-eresearch/provision-labarchives": "git+https://code.research.uts.edu.au/eresearch/provision-labarchives.git",
+    "lodash": "^4.17.11",
+    "ncp": "^2.0.0",
+    "path-exists": "^3.0.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.3.3"
   }
 }
