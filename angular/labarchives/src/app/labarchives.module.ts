@@ -3,6 +3,8 @@ import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared/shared.module';
 
+import {LabarchivesService} from "./labarchives.service";
+
 import {LabarchivesFormComponent} from './labarchives-form.component';
 import {LabarchivesLoginComponent} from './components/labarchives-login.component';
 import {LabarchivesListComponent} from './components/labarchives-list.component';
@@ -15,7 +17,9 @@ import {LabarchivesListComponent} from './components/labarchives-list.component'
     LabarchivesFormComponent, LabarchivesLoginComponent, LabarchivesListComponent
   ],
   exports: [],
-  providers: [],
+  providers: [
+    LabarchivesService
+  ],
   bootstrap: [
     LabarchivesFormComponent
   ],

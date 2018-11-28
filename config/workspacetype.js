@@ -4,7 +4,7 @@ module.exports.workspacetype = {
     label: 'LabArchives',
     subtitle: 'LabNotebooks',
     description: 'Create or link LabNotebooks (LabArchives) workspace:',
-    logo: '/angular/labarchives/assets/images/labarchives.png',
+    logo: '/angular/labarchives/assets/images/la.png',
     action: {default: 'list', available: ['create', 'list']}
   }
 };
