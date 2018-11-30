@@ -8,13 +8,14 @@ import {LabarchivesService} from "./labarchives.service";
 import {LabarchivesFormComponent} from './labarchives-form.component';
 import {LabarchivesLoginComponent} from './components/labarchives-login.component';
 import {LabarchivesListComponent} from './components/labarchives-list.component';
+import {LabarchivesLinkComponent} from "./components/labarchives-link.component";
 
 @NgModule({
   imports: [
     BrowserModule, ReactiveFormsModule, FormsModule, SharedModule
   ],
   declarations: [
-    LabarchivesFormComponent, LabarchivesLoginComponent, LabarchivesListComponent
+    LabarchivesFormComponent, LabarchivesLoginComponent, LabarchivesListComponent, LabarchivesLinkComponent
   ],
   exports: [],
   providers: [
@@ -24,7 +25,7 @@ import {LabarchivesListComponent} from './components/labarchives-list.component'
     LabarchivesFormComponent
   ],
   entryComponents: [
-    LabarchivesFormComponent, LabarchivesListComponent, LabarchivesLoginComponent
+    LabarchivesFormComponent, LabarchivesListComponent, LabarchivesLoginComponent, LabarchivesLinkComponent
   ]
 })
 export class LabarchivesModule {

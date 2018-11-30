@@ -3,6 +3,8 @@ import {FormGroup, FormControl, Validators, NgForm} from '@angular/forms';
 import {SimpleComponent} from '../shared/form/field-simple.component';
 import {FieldBase} from '../shared/form/field-base';
 
+declare var jQuery: any;
+
 import {LabarchivesService} from "../labarchives.service";
 
 export class LabarchivesLoginField extends FieldBase<any> {
@@ -15,14 +17,17 @@ export class LabarchivesLoginField extends FieldBase<any> {
 
   submitted = false;
   errorMessage: string = undefined;
+  closeLabel: string;
 
   user: any;
+  loggedIn: boolean;
   labarchivesService: LabarchivesService;
 
   @Output() userLogin = new EventEmitter<any>();
 
   constructor(options: any, injector: any) {
     super(options, injector);
+    this.closeLabel = 'Close';
     this.labarchivesService = this.getFromInjector(LabarchivesService);
   }
 
@@ -34,9 +39,10 @@ export class LabarchivesLoginField extends FieldBase<any> {
       this.user = {username: form.username, password: form.password};
       const login = await this.labarchivesService.login(this.user.username, this.user.password);
       if (login.status) {
-        this.user.loggedIn = true;
+        this.loggedIn = true;
         this.userLogin.emit(login.labUser);
         this.submitted = true;
+        this.errorMessage = null;
       } else {
         this.errorMessage = login.message;
       }
@@ -56,13 +62,17 @@ export class LabarchivesLoginField extends FieldBase<any> {
     return '';
   }
 
+  loginViaInstitution() {
+    jQuery('#institutionModal').modal('show');
+  }
+
 }
 
 @Component({
   selector: 'ws-labarchiveslogin',
   template: `
     <div class="row">
-      <div class="col-md-5 col-md-offset-2">
+      <div *ngIf="!field.loggedIn" class="col-md-5 col-md-offset-2">
         <form #form="ngForm">
           <div class="form-group">
             <label>{{ field.usernameLabel }}</label>
@@ -75,21 +85,37 @@ export class LabarchivesLoginField extends FieldBase<any> {
                    attr.aria-label="{{ field.passwordLabel }}">
           </div>
           <div class="form-row">
-            <button (click)="field.login(form.value)" type="submit" [disabled]="!field.valid" class="btn btn-primary">
-              Login
-            </button>
-          </div>
-          <div>
-            <p>or</p>
-          </div>
-          <div class="form-group">
-            <button type="submit" [disabled]="!field.valid" class="btn btn-primary">Login trough UTS</button>
+            <p>
+              <button (click)="field.login(form.value)" type="submit" [disabled]="!field.valid" class="btn btn-primary">
+                Login via KEY
+              </button>
+              or
+              <button (click)="field.loginViaInstitution()" type="submit" [disabled]="!field.valid"
+                      class="btn btn-info">
+                Login trough UTS
+              </button>
+            </p>
           </div>
           <div class="alert alert-danger" *ngIf="field.errorMessage">{{ field.errorMessage }}</div>
           <div>
             <p></p>
           </div>
         </form>
+      </div>
+    </div>
+    <div id="institutionModal" class="modal fade">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Login via UTS</h4>
+          </div>
+          <div class="modal-body">
+            <p>Login not available please use Key method</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ field.closeLabel }}</button>
+          </div>
+        </div>
       </div>
     </div>
   `
