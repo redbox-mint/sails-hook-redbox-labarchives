@@ -16,36 +16,34 @@ export class LabarchivesListField extends FieldBase<any> {
   workspaces: any;
 
   @Input() user: any;
+  @Output() link: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(options: any, injector: any) {
     super(options, injector);
     this.columns = [
-      {'show': false, 'property': 'id'},
       {'label': 'Name', 'property': 'name'},
-      {'label': 'Description', 'property': 'description'},
+      {'label': 'Default', 'property': 'isDefault'},
       {'label': 'Location', 'property': 'web_url', 'link': 'true'}
     ];
     this.rdmpLinkLabel = 'Plan';
     this.syncLabel = 'Sync';
-
   }
 
   registerEvents() {
     this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
+    //this.fieldMap['Link'].field['linkItem'].subscribe(this.listWorkspaces.bind(this));
   }
 
   listWorkspaces(labUser: any) {
-    const notebooks = labUser['notebooks'];
-    if (notebooks && notebooks['notebook']) {
-      const nbs = notebooks['notebook'];
-      console.log(nbs);
-      this.workspaces = nbs.map((nb) => {
-        const isDefault = nb['is-default'];
+    if (labUser && labUser.notebooks) {
+      this.workspaces = labUser.notebooks.map((nb) => {
+        const isDefault = nb['isDefault'] ? 'default' : '';
         return {
+          id: nb['id'],
           name: nb['name'],
-          description: isDefault._ !== 'false' ? 'default' : '',
+          description: isDefault,
           web_url: '',
-          rdmp: {info: '', id: nb['id']}
+          rdmp: {info: ''}
         }
       });
     } else {
@@ -54,8 +52,9 @@ export class LabarchivesListField extends FieldBase<any> {
   }
 
   linkWorkspace(item: any) {
-    alert('linking')
+    this.link.emit(item);
   }
+
 
 }
 
@@ -64,7 +63,7 @@ export class LabarchivesListField extends FieldBase<any> {
   selector: 'ws-labarchiveslist',
   template: `
     <div class="row">
-      <div class="col-lg-10">
+      <div *ngIf="field.workspaces" class="col-lg-10">
         <div class="">
           <table class="table">
             <thead>
@@ -79,23 +78,23 @@ export class LabarchivesListField extends FieldBase<any> {
             <tr *ngFor="let item of field.workspaces">
               <ng-container *ngFor="let column of field.columns">
                 <td *ngIf="column.show != false">
-                <span *ngIf="column.link; else noProcessing ">
-                  <a target="_blank" rel="noopener noreferrer"
-                     href="{{ item[column.property] }}">{{ item[column.property]}}</a>
-                </span>
+                  <span *ngIf="column.link; else noProcessing ">
+                    <a target="_blank" rel="noopener noreferrer"
+                       href="{{ item[column.property] }}">{{ item[column.property]}}</a>
+                  </span>
                   <ng-template #multivalue></ng-template>
                   <ng-template #noProcessing><span>{{ item[column.property] }}</span></ng-template>
                 </td>
               </ng-container>
               <td>
-            <span *ngIf="item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked ">
-              <button disabled type="button" class="btn btn-success btn-block"
-                      *ngIf="item.rdmp.info.rdmp === field.rdmp"> Linked </button>
-              <button disabled type="button" class="btn btn-info btn-block" *ngIf="item.rdmp.info.rdmp != field.rdmp"> Linked to another RDMP</button>
-            </span>
+                  <span *ngIf="item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked ">
+                    <button disabled type="button" class="btn btn-success btn-block"
+                            *ngIf="item.rdmp.info.rdmp === field.rdmp"> Linked </button>
+                    <button disabled type="button" class="btn btn-info btn-block"
+                            *ngIf="item.rdmp.info.rdmp != field.rdmp"> Linked to another RDMP</button>
+                  </span>
                 <ng-template #isNotLinked>
-                  <button type="button" class="btn btn-info btn-block" (click)="field.linkWorkspace(item)"> Link
-                  </button>
+                  <button type="button" class="btn btn-info btn-block" (click)="field.linkWorkspace(item)">Link</button>
                 </ng-template>
               </td>
             </tr>
@@ -104,17 +103,12 @@ export class LabarchivesListField extends FieldBase<any> {
           <div *ngIf="field.loading" class="">
             <img class="center-block" src="/images/loading.svg">
           </div>
-          <p *ngIf="field.failedObjects.length > 0">There were {{ field.failedObjects.length }} records that failed to
-            load</p>
-          <p *ngIf="field.accessDeniedObjects.length > 0">There were {{ field.accessDeniedObjects.length }} records that
-            you do not have access to</p>
-          <div class="">
-            <button type="button" class="btn btn-default" (click)="field.listWorkspaces()"><i
-              class="fa fa-refresh"></i>&nbsp;{{ field.syncLabel }}
-            </button>
-          </div>
           <div>
-            <p></p>
+            <p *ngIf="field.failedObjects.length > 0">There were {{ field.failedObjects.length }} records that failed to
+              load</p>
+            <p *ngIf="field.accessDeniedObjects.length > 0">There were {{ field.accessDeniedObjects.length }} records
+              that
+              you do not have access to</p>
           </div>
         </div>
       </div>

@@ -49,28 +49,15 @@ export class LabarchivesService extends BaseService {
   }
 
 
-  public async createRequest(request: any, rdmpId: string) {
-    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/create';
+  public async link(workspace: any, rdmpId: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/link';
     try {
       const result = await this.http.post(
         wsUrl,
-        {request: request, rdmp: rdmpId},
+        {rdmp: rdmpId, workspace: workspace},
         this.options
       ).toPromise();
       return Promise.resolve(this.extractData(result));
-    } catch (e) {
-      return Promise.reject(new Error(e));
-    }
-  }
-
-  public async getUserInfo() {
-    const wsUrl = this.brandingAndPortalUrl + '/user/info';
-    try {
-      const result = await this.http.get(
-        wsUrl,
-        this.options
-      ).toPromise();
-      return Promise.resolve((this.extractData(result)));
     } catch (e) {
       return Promise.reject(new Error(e));
     }

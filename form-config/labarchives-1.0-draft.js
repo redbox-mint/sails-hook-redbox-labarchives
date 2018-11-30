@@ -43,6 +43,13 @@ module.exports = {
       }
     },
     {
+      class: 'LabarchivesLinkField',
+      viewOnly: false,
+      definition: {
+        name: 'Link'
+      }
+    },
+    {
       class: "AnchorOrButton",
       viewOnly: false,
       definition: {

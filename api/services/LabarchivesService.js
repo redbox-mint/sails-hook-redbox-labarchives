@@ -17,7 +17,9 @@ var Services;
         constructor() {
             super();
             this._exportedMethods = [
-                'login'
+                'login',
+                'insertNode',
+                'addEntry'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
         }
@@ -26,6 +28,36 @@ var Services;
                 try {
                     if (key && key['akid'] && key['password']) {
                         return yield la.accessInfo(key, username, password);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        insertNode(key, userId, nbId, displayText) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.insertNode(key, userId, nbId, 0, displayText, false);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        addEntry(key, userId, nbId, treeId, partType, metadata) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.addEntry(key, userId, nbId, treeId, partType, metadata);
                     }
                     else {
                         return Promise.reject(new Error('missing keys for accessing lab archives APIs'));

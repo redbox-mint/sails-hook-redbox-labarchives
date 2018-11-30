@@ -55,7 +55,9 @@ module.exports = function (sails) {
     routes: {
       before: {},
       after: {
-        'post /:branding/:portal/ws/labarchives/login': LabarchivesController.login
+        'post /:branding/:portal/ws/labarchives/login': LabarchivesController.login,
+        'post /:branding/:portal/ws/labarchives/link': LabarchivesController.link
+
       }
     },
     configure: function () {

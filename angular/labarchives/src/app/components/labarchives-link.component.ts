@@ -1,0 +1,166 @@
+import {Input, Output, Component, OnInit, Inject, Injector, EventEmitter} from '@angular/core';
+import {SimpleComponent} from '../shared/form/field-simple.component';
+import {FieldBase} from '../shared/form/field-base';
+import {FormGroup, FormControl, Validators} from '@angular/forms';
+import * as _ from "lodash-es";
+
+import {Checks} from './helpers';
+import {LabarchivesService} from '../labarchives.service';
+
+// STEST-22
+declare var jQuery: any;
+
+/**
+ * Contributor Model
+ *
+ * @author <a target='_' href='https://github.com/moisbo'>moisbo</a>
+ *
+ */
+export class LabarchivesLinkField extends FieldBase<any> {
+
+  closeLabel: string;
+  processing: boolean;
+  workspaceDetailsTitle: string;
+  workspaceDefinition: string;
+  currentWorkspace: any;
+  processingLabel: string;
+  processingMessage: string;
+  processingSuccess: string;
+  processingFail: string;
+  processingStatus: string;
+
+  checks: Checks;
+  rdmp: string;
+
+  @Input() LinkItem: EventEmitter<any> = new EventEmitter<any>();
+
+  labarchivesService: LabarchivesService;
+
+  constructor(options: any, injector: any) {
+    super(options, injector);
+    this.labarchivesService = this.getFromInjector(LabarchivesService);
+    this.closeLabel = 'Close';
+    this.processing = false;
+    this.workspaceDetailsTitle = 'Workspace Title';
+    this.workspaceDefinition = '';
+    this.currentWorkspace = {};
+    this.processingLabel = 'Processing...';
+    this.processingMessage = 'processing message';
+    this.checks = new Checks();
+    this.processingSuccess = 'Success';
+    this.processingFail = 'Failed';
+    this.processingStatus = '';
+  }
+
+  init() {
+    this.rdmp = this.fieldMap._rootComp.rdmp;
+  }
+
+  registerEvents() {
+    this.fieldMap['List'].field['link'].subscribe(this.linkItem.bind(this));
+  }
+
+  createFormModel(valueElem: any = undefined): any {
+    if (valueElem) {
+      this.value = valueElem;
+    }
+
+    this.formModel = new FormControl(this.value || []);
+
+    if (this.value) {
+      this.setValue(this.value);
+    }
+
+    return this.formModel;
+  }
+
+  setValue(value: any) {
+    this.formModel.patchValue(value, {emitEvent: false});
+    this.formModel.markAsTouched();
+  }
+
+  setEmptyValue() {
+    this.value = [];
+    return this.value;
+  }
+
+  async linkItem(item: any) {
+    try {
+      jQuery('#linkModal').modal('show');
+      this.processing = true;
+      this.processingStatus = 'linking';
+      const link = await this.labarchivesService.link(item, this.rdmp);
+      this.processingStatus = 'done';
+      this.checks.link = true;
+      this.processing = false;
+      if (link.status) {
+        this.checks.linkCreated = true;
+        this.checks.master = true;
+        this.processingFail = undefined;
+      } else {
+        this.checks.linkWithOther = true
+      }
+    } catch (e) {
+      this.processing = false;
+      this.checks.linkWithOther = true
+    }
+  }
+}
+
+/**
+ * Component that Links Workspaces to Workspace Records in Stash
+ */
+@Component({
+  selector: 'ws-labarchiveslink',
+  template: `
+    <div id="linkModal" class="modal fade" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Link Workspace</h4>
+          </div>
+          <div class="modal-body">
+            <h5>{{ field.workspaceDetailsTitle }}</h5>
+            <p *ngFor="let item of field.workspaceDefinition">{{ item.label }} :
+              {{ field.currentWorkspace[item.name]}}</p>
+            <h5>{{ field.processingLabel }}</h5>
+            <p>{{ field.processingMessage }}&nbsp;<span
+              *ngIf="field.checks.master; then isDone; else isSpinning"></span></p>
+            <p *ngIf="field.checks.comparing">{{ field.comparingLabel }}&nbsp;<span
+              *ngIf="field.checks.link; then isDone; else isSpinning"></span></p>
+            <p *ngIf="field.checks.link == false">{{ field.statusLabel }}&nbsp;<span
+              *ngIf="field.checks.rdmp; then isDone; else isSpinning"></span></p>
+            <p class="alert alert-success" *ngIf="field.checks.linkCreated">{{ field.processingSuccess }}</p>
+            <p class="alert alert-danger" *ngIf="field.checks.linkWithOther">{{ field.processingFail }}</p>
+            <p class="alert alert-danger" *ngIf="field.processingStatus === 'done' && field.processingFail">
+              {{ field.processingFail }}</p>
+            <ng-template #isDone>
+              <i class="fa fa-check-circle"></i>
+            </ng-template>
+            <ng-template #isSpinning>
+              <i class="fa fa-spinner fa-spin"></i>
+            </ng-template>
+          </div>
+          <div class="modal-footer">
+            <span *ngIf="field.processing; then waitForProcessing; else finishProcessing"></span>
+            <ng-template #finishProcessing>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ field.closeLabel }}</button>
+            </ng-template>
+            <ng-template #waitForProcessing>
+              <button type="button" class="btn btn-secondary disabled" data-dismiss="modal">{{ field.closeLabel }}
+              </button>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class LabarchivesLinkComponent extends SimpleComponent {
+  field: LabarchivesLinkField;
+
+  ngOnInit() {
+    this.field.init();
+    this.field.registerEvents();
+  }
+}

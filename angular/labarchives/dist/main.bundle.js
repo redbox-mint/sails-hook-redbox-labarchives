@@ -8379,6 +8379,268 @@ webpackEmptyAsyncContext.id = "./src/$$_lazy_route_resource lazy recursive";
 
 /***/ }),
 
+/***/ "./src/app/components/helpers.ts":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var WorkspaceUser = /** @class */ (function () {
+    function WorkspaceUser() {
+    }
+    return WorkspaceUser;
+}());
+exports.WorkspaceUser = WorkspaceUser;
+var Checks = /** @class */ (function () {
+    function Checks() {
+        this.link = undefined;
+        this.rdmp = false;
+        this.linkCreated = false;
+        this.linkWithOther = false;
+        this.master = false;
+        this.comparing = false;
+    }
+    Checks.prototype.clear = function () {
+        this.linkCreated = false;
+        this.linkWithOther = false;
+    };
+    return Checks;
+}());
+exports.Checks = Checks;
+var Creation = /** @class */ (function () {
+    function Creation() {
+        this.created = false;
+        this.name = '';
+        this.blank = true;
+        this.description = '';
+    }
+    Creation.prototype.clear = function () {
+        this.location = '';
+        this.description = '';
+        this.name = '';
+        this.id = '';
+    };
+    Creation.prototype.nameHasSpaces = function () {
+        return /\s/g.test(this.name);
+    };
+    return Creation;
+}());
+exports.Creation = Creation;
+var CreationAlert = /** @class */ (function () {
+    function CreationAlert() {
+        this.message = '';
+        this.className = 'danger';
+        this.status = '';
+    }
+    CreationAlert.prototype.set = function (_a) {
+        var message = _a.message, status = _a.status, className = _a.className;
+        this.message = message;
+        this.status = status;
+        this.className = className;
+    };
+    CreationAlert.prototype.clear = function () {
+        this.message = '';
+        this.className = 'danger';
+        this.status = '';
+    };
+    return CreationAlert;
+}());
+exports.CreationAlert = CreationAlert;
+var CurrentWorkspace = /** @class */ (function () {
+    function CurrentWorkspace() {
+        this.path_with_namespace = '';
+        this.web_url = '';
+    }
+    return CurrentWorkspace;
+}());
+exports.CurrentWorkspace = CurrentWorkspace;
+
+
+/***/ }),
+
+/***/ "./src/app/components/labarchives-link.component.ts":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
+var field_simple_component_1 = __webpack_require__("./redbox-portal/angular/shared/form/field-simple.component.ts");
+var field_base_1 = __webpack_require__("./redbox-portal/angular/shared/form/field-base.ts");
+var forms_1 = __webpack_require__("./node_modules/@angular/forms/esm5/forms.js");
+var helpers_1 = __webpack_require__("./src/app/components/helpers.ts");
+var labarchives_service_1 = __webpack_require__("./src/app/labarchives.service.ts");
+/**
+ * Contributor Model
+ *
+ * @author <a target='_' href='https://github.com/moisbo'>moisbo</a>
+ *
+ */
+var LabarchivesLinkField = /** @class */ (function (_super) {
+    __extends(LabarchivesLinkField, _super);
+    function LabarchivesLinkField(options, injector) {
+        var _this = _super.call(this, options, injector) || this;
+        _this.LinkItem = new core_1.EventEmitter();
+        _this.labarchivesService = _this.getFromInjector(labarchives_service_1.LabarchivesService);
+        _this.closeLabel = 'Close';
+        _this.processing = false;
+        _this.workspaceDetailsTitle = 'Workspace Title';
+        _this.workspaceDefinition = '';
+        _this.currentWorkspace = {};
+        _this.processingLabel = 'Processing...';
+        _this.processingMessage = 'processing message';
+        _this.checks = new helpers_1.Checks();
+        _this.processingSuccess = 'Success';
+        _this.processingFail = 'Failed';
+        _this.processingStatus = '';
+        return _this;
+    }
+    LabarchivesLinkField.prototype.init = function () {
+        this.rdmp = this.fieldMap._rootComp.rdmp;
+    };
+    LabarchivesLinkField.prototype.registerEvents = function () {
+        this.fieldMap['List'].field['link'].subscribe(this.linkItem.bind(this));
+    };
+    LabarchivesLinkField.prototype.createFormModel = function (valueElem) {
+        if (valueElem === void 0) { valueElem = undefined; }
+        if (valueElem) {
+            this.value = valueElem;
+        }
+        this.formModel = new forms_1.FormControl(this.value || []);
+        if (this.value) {
+            this.setValue(this.value);
+        }
+        return this.formModel;
+    };
+    LabarchivesLinkField.prototype.setValue = function (value) {
+        this.formModel.patchValue(value, { emitEvent: false });
+        this.formModel.markAsTouched();
+    };
+    LabarchivesLinkField.prototype.setEmptyValue = function () {
+        this.value = [];
+        return this.value;
+    };
+    LabarchivesLinkField.prototype.linkItem = function (item) {
+        return __awaiter(this, void 0, void 0, function () {
+            var link, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        jQuery('#linkModal').modal('show');
+                        this.processing = true;
+                        this.processingStatus = 'linking';
+                        return [4 /*yield*/, this.labarchivesService.link(item, this.rdmp)];
+                    case 1:
+                        link = _a.sent();
+                        this.processingStatus = 'done';
+                        this.checks.link = true;
+                        this.processing = false;
+                        if (link.status) {
+                            this.checks.linkCreated = true;
+                            this.checks.master = true;
+                            this.processingFail = undefined;
+                        }
+                        else {
+                            this.checks.linkWithOther = true;
+                        }
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_1 = _a.sent();
+                        this.processing = false;
+                        this.checks.linkWithOther = true;
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    __decorate([
+        core_1.Input(),
+        __metadata("design:type", core_1.EventEmitter)
+    ], LabarchivesLinkField.prototype, "LinkItem", void 0);
+    return LabarchivesLinkField;
+}(field_base_1.FieldBase));
+exports.LabarchivesLinkField = LabarchivesLinkField;
+/**
+ * Component that Links Workspaces to Workspace Records in Stash
+ */
+var LabarchivesLinkComponent = /** @class */ (function (_super) {
+    __extends(LabarchivesLinkComponent, _super);
+    function LabarchivesLinkComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    LabarchivesLinkComponent.prototype.ngOnInit = function () {
+        this.field.init();
+        this.field.registerEvents();
+    };
+    LabarchivesLinkComponent = __decorate([
+        core_1.Component({
+            selector: 'ws-labarchiveslink',
+            template: "\n    <div id=\"linkModal\" class=\"modal fade\" data-keyboard=\"false\">\n      <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n          <div class=\"modal-header\">\n            <h4 class=\"modal-title\">Link Workspace</h4>\n          </div>\n          <div class=\"modal-body\">\n            <h5>{{ field.workspaceDetailsTitle }}</h5>\n            <p *ngFor=\"let item of field.workspaceDefinition\">{{ item.label }} :\n              {{ field.currentWorkspace[item.name]}}</p>\n            <h5>{{ field.processingLabel }}</h5>\n            <p>{{ field.processingMessage }}&nbsp;<span\n              *ngIf=\"field.checks.master; then isDone; else isSpinning\"></span></p>\n            <p *ngIf=\"field.checks.comparing\">{{ field.comparingLabel }}&nbsp;<span\n              *ngIf=\"field.checks.link; then isDone; else isSpinning\"></span></p>\n            <p *ngIf=\"field.checks.link == false\">{{ field.statusLabel }}&nbsp;<span\n              *ngIf=\"field.checks.rdmp; then isDone; else isSpinning\"></span></p>\n            <p class=\"alert alert-success\" *ngIf=\"field.checks.linkCreated\">{{ field.processingSuccess }}</p>\n            <p class=\"alert alert-danger\" *ngIf=\"field.checks.linkWithOther\">{{ field.processingFail }}</p>\n            <p class=\"alert alert-danger\" *ngIf=\"field.processingStatus === 'done' && field.processingFail\">\n              {{ field.processingFail }}</p>\n            <ng-template #isDone>\n              <i class=\"fa fa-check-circle\"></i>\n            </ng-template>\n            <ng-template #isSpinning>\n              <i class=\"fa fa-spinner fa-spin\"></i>\n            </ng-template>\n          </div>\n          <div class=\"modal-footer\">\n            <span *ngIf=\"field.processing; then waitForProcessing; else finishProcessing\"></span>\n            <ng-template #finishProcessing>\n              <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">{{ field.closeLabel }}</button>\n            </ng-template>\n            <ng-template #waitForProcessing>\n              <button type=\"button\" class=\"btn btn-secondary disabled\" data-dismiss=\"modal\">{{ field.closeLabel }}\n              </button>\n            </ng-template>\n          </div>\n        </div>\n      </div>\n    </div>\n  "
+        })
+    ], LabarchivesLinkComponent);
+    return LabarchivesLinkComponent;
+}(field_simple_component_1.SimpleComponent));
+exports.LabarchivesLinkComponent = LabarchivesLinkComponent;
+
+
+/***/ }),
+
 /***/ "./src/app/components/labarchives-list.component.ts":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8413,10 +8675,10 @@ var LabarchivesListField = /** @class */ (function (_super) {
         var _this = _super.call(this, options, injector) || this;
         _this.accessDeniedObjects = [];
         _this.failedObjects = [];
+        _this.link = new core_1.EventEmitter();
         _this.columns = [
-            { 'show': false, 'property': 'id' },
             { 'label': 'Name', 'property': 'name' },
-            { 'label': 'Description', 'property': 'description' },
+            { 'label': 'Default', 'property': 'isDefault' },
             { 'label': 'Location', 'property': 'web_url', 'link': 'true' }
         ];
         _this.rdmpLinkLabel = 'Plan';
@@ -8425,19 +8687,18 @@ var LabarchivesListField = /** @class */ (function (_super) {
     }
     LabarchivesListField.prototype.registerEvents = function () {
         this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
+        //this.fieldMap['Link'].field['linkItem'].subscribe(this.listWorkspaces.bind(this));
     };
     LabarchivesListField.prototype.listWorkspaces = function (labUser) {
-        var notebooks = labUser['notebooks'];
-        if (notebooks && notebooks['notebook']) {
-            var nbs = notebooks['notebook'];
-            console.log(nbs);
-            this.workspaces = nbs.map(function (nb) {
-                var isDefault = nb['is-default'];
+        if (labUser && labUser.notebooks) {
+            this.workspaces = labUser.notebooks.map(function (nb) {
+                var isDefault = nb['isDefault'] ? 'default' : '';
                 return {
+                    id: nb['id'],
                     name: nb['name'],
-                    description: isDefault._ !== 'false' ? 'default' : '',
+                    description: isDefault,
                     web_url: '',
-                    rdmp: { info: '', id: nb['id'] }
+                    rdmp: { info: '' }
                 };
             });
         }
@@ -8446,12 +8707,16 @@ var LabarchivesListField = /** @class */ (function (_super) {
         }
     };
     LabarchivesListField.prototype.linkWorkspace = function (item) {
-        alert('linking');
+        this.link.emit(item);
     };
     __decorate([
         core_1.Input(),
         __metadata("design:type", Object)
     ], LabarchivesListField.prototype, "user", void 0);
+    __decorate([
+        core_1.Output(),
+        __metadata("design:type", core_1.EventEmitter)
+    ], LabarchivesListField.prototype, "link", void 0);
     return LabarchivesListField;
 }(field_base_1.FieldBase));
 exports.LabarchivesListField = LabarchivesListField;
@@ -8466,7 +8731,7 @@ var LabarchivesListComponent = /** @class */ (function (_super) {
     LabarchivesListComponent = __decorate([
         core_1.Component({
             selector: 'ws-labarchiveslist',
-            template: "\n    <div class=\"row\">\n      <div class=\"col-lg-10\">\n        <div class=\"\">\n          <table class=\"table\">\n            <thead>\n            <tr>\n              <ng-container *ngFor=\"let header of field.columns\">\n                <th>{{ header.label }}</th>\n              </ng-container>\n              <th>{{ field.rdmpLinkLabel }}</th>\n            </tr>\n            </thead>\n            <tbody>\n            <tr *ngFor=\"let item of field.workspaces\">\n              <ng-container *ngFor=\"let column of field.columns\">\n                <td *ngIf=\"column.show != false\">\n                <span *ngIf=\"column.link; else noProcessing \">\n                  <a target=\"_blank\" rel=\"noopener noreferrer\"\n                     href=\"{{ item[column.property] }}\">{{ item[column.property]}}</a>\n                </span>\n                  <ng-template #multivalue></ng-template>\n                  <ng-template #noProcessing><span>{{ item[column.property] }}</span></ng-template>\n                </td>\n              </ng-container>\n              <td>\n            <span *ngIf=\"item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked \">\n              <button disabled type=\"button\" class=\"btn btn-success btn-block\"\n                      *ngIf=\"item.rdmp.info.rdmp === field.rdmp\"> Linked </button>\n              <button disabled type=\"button\" class=\"btn btn-info btn-block\" *ngIf=\"item.rdmp.info.rdmp != field.rdmp\"> Linked to another RDMP</button>\n            </span>\n                <ng-template #isNotLinked>\n                  <button type=\"button\" class=\"btn btn-info btn-block\" (click)=\"field.linkWorkspace(item)\"> Link\n                  </button>\n                </ng-template>\n              </td>\n            </tr>\n            </tbody>\n          </table>\n          <div *ngIf=\"field.loading\" class=\"\">\n            <img class=\"center-block\" src=\"/images/loading.svg\">\n          </div>\n          <p *ngIf=\"field.failedObjects.length > 0\">There were {{ field.failedObjects.length }} records that failed to\n            load</p>\n          <p *ngIf=\"field.accessDeniedObjects.length > 0\">There were {{ field.accessDeniedObjects.length }} records that\n            you do not have access to</p>\n          <div class=\"\">\n            <button type=\"button\" class=\"btn btn-default\" (click)=\"field.listWorkspaces()\"><i\n              class=\"fa fa-refresh\"></i>&nbsp;{{ field.syncLabel }}\n            </button>\n          </div>\n          <div>\n            <p></p>\n          </div>\n        </div>\n      </div>\n    </div>\n  "
+            template: "\n    <div class=\"row\">\n      <div *ngIf=\"field.workspaces\" class=\"col-lg-10\">\n        <div class=\"\">\n          <table class=\"table\">\n            <thead>\n            <tr>\n              <ng-container *ngFor=\"let header of field.columns\">\n                <th>{{ header.label }}</th>\n              </ng-container>\n              <th>{{ field.rdmpLinkLabel }}</th>\n            </tr>\n            </thead>\n            <tbody>\n            <tr *ngFor=\"let item of field.workspaces\">\n              <ng-container *ngFor=\"let column of field.columns\">\n                <td *ngIf=\"column.show != false\">\n                  <span *ngIf=\"column.link; else noProcessing \">\n                    <a target=\"_blank\" rel=\"noopener noreferrer\"\n                       href=\"{{ item[column.property] }}\">{{ item[column.property]}}</a>\n                  </span>\n                  <ng-template #multivalue></ng-template>\n                  <ng-template #noProcessing><span>{{ item[column.property] }}</span></ng-template>\n                </td>\n              </ng-container>\n              <td>\n                  <span *ngIf=\"item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked \">\n                    <button disabled type=\"button\" class=\"btn btn-success btn-block\"\n                            *ngIf=\"item.rdmp.info.rdmp === field.rdmp\"> Linked </button>\n                    <button disabled type=\"button\" class=\"btn btn-info btn-block\"\n                            *ngIf=\"item.rdmp.info.rdmp != field.rdmp\"> Linked to another RDMP</button>\n                  </span>\n                <ng-template #isNotLinked>\n                  <button type=\"button\" class=\"btn btn-info btn-block\" (click)=\"field.linkWorkspace(item)\">Link</button>\n                </ng-template>\n              </td>\n            </tr>\n            </tbody>\n          </table>\n          <div *ngIf=\"field.loading\" class=\"\">\n            <img class=\"center-block\" src=\"/images/loading.svg\">\n          </div>\n          <div>\n            <p *ngIf=\"field.failedObjects.length > 0\">There were {{ field.failedObjects.length }} records that failed to\n              load</p>\n            <p *ngIf=\"field.accessDeniedObjects.length > 0\">There were {{ field.accessDeniedObjects.length }} records\n              that\n              you do not have access to</p>\n          </div>\n        </div>\n      </div>\n    </div>\n  "
         })
     ], LabarchivesListComponent);
     return LabarchivesListComponent;
@@ -8550,6 +8815,7 @@ var LabarchivesLoginField = /** @class */ (function (_super) {
         _this.submitted = false;
         _this.errorMessage = undefined;
         _this.userLogin = new core_1.EventEmitter();
+        _this.closeLabel = 'Close';
         _this.labarchivesService = _this.getFromInjector(labarchives_service_1.LabarchivesService);
         return _this;
     }
@@ -8568,9 +8834,10 @@ var LabarchivesLoginField = /** @class */ (function (_super) {
                     case 1:
                         login = _a.sent();
                         if (login.status) {
-                            this.user.loggedIn = true;
+                            this.loggedIn = true;
                             this.userLogin.emit(login.labUser);
                             this.submitted = true;
+                            this.errorMessage = null;
                         }
                         else {
                             this.errorMessage = login.message;
@@ -8593,6 +8860,9 @@ var LabarchivesLoginField = /** @class */ (function (_super) {
         }
         return '';
     };
+    LabarchivesLoginField.prototype.loginViaInstitution = function () {
+        jQuery('#institutionModal').modal('show');
+    };
     __decorate([
         core_1.Output(),
         __metadata("design:type", Object)
@@ -8610,7 +8880,7 @@ var LabarchivesLoginComponent = /** @class */ (function (_super) {
     LabarchivesLoginComponent = __decorate([
         core_1.Component({
             selector: 'ws-labarchiveslogin',
-            template: "\n    <div class=\"row\">\n      <div class=\"col-md-5 col-md-offset-2\">\n        <form #form=\"ngForm\">\n          <div class=\"form-group\">\n            <label>{{ field.usernameLabel }}</label>\n            <input type=\"text\" class=\"form-control\" ngModel name=\"username\"\n                   attr.aria-label=\"{{ field.usernameLabel }}\">\n          </div>\n          <div class=\"form-group\">\n            <label>{{ field.passwordLabel }}</label>\n            <input type=\"password\" class=\"form-control\" ngModel name=\"password\"\n                   attr.aria-label=\"{{ field.passwordLabel }}\">\n          </div>\n          <div class=\"form-row\">\n            <button (click)=\"field.login(form.value)\" type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">\n              Login\n            </button>\n          </div>\n          <div>\n            <p>or</p>\n          </div>\n          <div class=\"form-group\">\n            <button type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">Login trough UTS</button>\n          </div>\n          <div class=\"alert alert-danger\" *ngIf=\"field.errorMessage\">{{ field.errorMessage }}</div>\n          <div>\n            <p></p>\n          </div>\n        </form>\n      </div>\n    </div>\n  "
+            template: "\n    <div class=\"row\">\n      <div *ngIf=\"!field.loggedIn\" class=\"col-md-5 col-md-offset-2\">\n        <form #form=\"ngForm\">\n          <div class=\"form-group\">\n            <label>{{ field.usernameLabel }}</label>\n            <input type=\"text\" class=\"form-control\" ngModel name=\"username\"\n                   attr.aria-label=\"{{ field.usernameLabel }}\">\n          </div>\n          <div class=\"form-group\">\n            <label>{{ field.passwordLabel }}</label>\n            <input type=\"password\" class=\"form-control\" ngModel name=\"password\"\n                   attr.aria-label=\"{{ field.passwordLabel }}\">\n          </div>\n          <div class=\"form-row\">\n            <p>\n              <button (click)=\"field.login(form.value)\" type=\"submit\" [disabled]=\"!field.valid\" class=\"btn btn-primary\">\n                Login via KEY\n              </button>\n              or\n              <button (click)=\"field.loginViaInstitution()\" type=\"submit\" [disabled]=\"!field.valid\"\n                      class=\"btn btn-info\">\n                Login trough UTS\n              </button>\n            </p>\n          </div>\n          <div class=\"alert alert-danger\" *ngIf=\"field.errorMessage\">{{ field.errorMessage }}</div>\n          <div>\n            <p></p>\n          </div>\n        </form>\n      </div>\n    </div>\n    <div id=\"institutionModal\" class=\"modal fade\">\n      <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n          <div class=\"modal-header\">\n            <h4 class=\"modal-title\">Login via UTS</h4>\n          </div>\n          <div class=\"modal-body\">\n            <p>Login not available please use Key method</p>\n          </div>\n          <div class=\"modal-footer\">\n            <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">{{ field.closeLabel }}</button>\n          </div>\n        </div>\n      </div>\n    </div>\n  "
         })
     ], LabarchivesLoginComponent);
     return LabarchivesLoginComponent;
@@ -8670,6 +8940,7 @@ var field_control_service_1 = __webpack_require__("./redbox-portal/angular/share
 var translation_service_1 = __webpack_require__("./redbox-portal/angular/shared/translation-service.ts");
 var labarchives_login_component_1 = __webpack_require__("./src/app/components/labarchives-login.component.ts");
 var labarchives_list_component_1 = __webpack_require__("./src/app/components/labarchives-list.component.ts");
+var labarchives_link_component_1 = __webpack_require__("./src/app/components/labarchives-link.component.ts");
 /**
  * Main LabArchives Edit component
  *
@@ -8712,7 +8983,8 @@ var LabarchivesFormComponent = /** @class */ (function (_super) {
         var _this = this;
         this.fcs.addComponentClasses({
             'LabarchivesLoginField': { 'meta': labarchives_login_component_1.LabarchivesLoginField, 'comp': labarchives_login_component_1.LabarchivesLoginComponent },
-            'LabarchivesListField': { 'meta': labarchives_list_component_1.LabarchivesListField, 'comp': labarchives_list_component_1.LabarchivesListComponent }
+            'LabarchivesListField': { 'meta': labarchives_list_component_1.LabarchivesListField, 'comp': labarchives_list_component_1.LabarchivesListComponent },
+            'LabarchivesLinkField': { 'meta': labarchives_link_component_1.LabarchivesLinkField, 'comp': labarchives_link_component_1.LabarchivesLinkComponent }
         });
         this.RecordsService.getForm(this.oid, this.recordType, this.editMode).then(function (obs) {
             obs.subscribe(function (form) {
@@ -8819,6 +9091,7 @@ var labarchives_service_1 = __webpack_require__("./src/app/labarchives.service.t
 var labarchives_form_component_1 = __webpack_require__("./src/app/labarchives-form.component.ts");
 var labarchives_login_component_1 = __webpack_require__("./src/app/components/labarchives-login.component.ts");
 var labarchives_list_component_1 = __webpack_require__("./src/app/components/labarchives-list.component.ts");
+var labarchives_link_component_1 = __webpack_require__("./src/app/components/labarchives-link.component.ts");
 var LabarchivesModule = /** @class */ (function () {
     function LabarchivesModule() {
     }
@@ -8828,7 +9101,7 @@ var LabarchivesModule = /** @class */ (function () {
                 platform_browser_1.BrowserModule, forms_1.ReactiveFormsModule, forms_1.FormsModule, shared_module_1.SharedModule
             ],
             declarations: [
-                labarchives_form_component_1.LabarchivesFormComponent, labarchives_login_component_1.LabarchivesLoginComponent, labarchives_list_component_1.LabarchivesListComponent
+                labarchives_form_component_1.LabarchivesFormComponent, labarchives_login_component_1.LabarchivesLoginComponent, labarchives_list_component_1.LabarchivesListComponent, labarchives_link_component_1.LabarchivesLinkComponent
             ],
             exports: [],
             providers: [
@@ -8838,7 +9111,7 @@ var LabarchivesModule = /** @class */ (function () {
                 labarchives_form_component_1.LabarchivesFormComponent
             ],
             entryComponents: [
-                labarchives_form_component_1.LabarchivesFormComponent, labarchives_list_component_1.LabarchivesListComponent, labarchives_login_component_1.LabarchivesLoginComponent
+                labarchives_form_component_1.LabarchivesFormComponent, labarchives_list_component_1.LabarchivesListComponent, labarchives_login_component_1.LabarchivesLoginComponent, labarchives_link_component_1.LabarchivesLinkComponent
             ]
         })
     ], LabarchivesModule);
@@ -8961,45 +9234,23 @@ var LabarchivesService = /** @class */ (function (_super) {
             });
         });
     };
-    LabarchivesService.prototype.createRequest = function (request, rdmpId) {
+    LabarchivesService.prototype.link = function (workspace, rdmpId) {
         return __awaiter(this, void 0, void 0, function () {
             var wsUrl, result, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/create';
+                        wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/link';
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.http.post(wsUrl, { request: request, rdmp: rdmpId }, this.options).toPromise()];
+                        return [4 /*yield*/, this.http.post(wsUrl, { rdmp: rdmpId, workspace: workspace }, this.options).toPromise()];
                     case 2:
                         result = _a.sent();
                         return [2 /*return*/, Promise.resolve(this.extractData(result))];
                     case 3:
                         e_2 = _a.sent();
                         return [2 /*return*/, Promise.reject(new Error(e_2))];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    LabarchivesService.prototype.getUserInfo = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var wsUrl, result, e_3;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        wsUrl = this.brandingAndPortalUrl + '/user/info';
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.http.get(wsUrl, this.options).toPromise()];
-                    case 2:
-                        result = _a.sent();
-                        return [2 /*return*/, Promise.resolve((this.extractData(result)))];
-                    case 3:
-                        e_3 = _a.sent();
-                        return [2 /*return*/, Promise.reject(new Error(e_3))];
                     case 4: return [2 /*return*/];
                 }
             });
