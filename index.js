@@ -6,6 +6,7 @@ const LabarchivesController = require('./api/controllers/LabarchivesController')
 const LabarchivesService = require('./api/services/LabarchivesService');
 const recordTypeConfig = require('./config/recordtype.js');
 const workflowConfig = require('./config/workflow.js');
+const workspaceTypeConfig = require('./config/workspacetype.js');
 const recordFormConfig = require('./form-config/labarchives-1.0-draft.js');
 
 module.exports = function (sails) {
@@ -64,6 +65,7 @@ module.exports = function (sails) {
       sails.services['LabarchivesService'] = LabarchivesService;
       sails.config = _.merge(sails.config, recordTypeConfig);
       sails.config = _.merge(sails.config, workflowConfig);
+      sails.config = _.merge(sails.config, workspaceTypeConfig);
       sails.config['form']['forms'] = _.merge(sails.config['form']['forms'], {'labarchives-1.0-draft': recordFormConfig});
     }
   }
