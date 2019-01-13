@@ -17,6 +17,8 @@ export class LabarchivesLoginField extends FieldBase<any> {
   loginLabel: string;
   helpLoginLabel: string;
   helpLoginLabelList: object[];
+  loginHelpImage: string;
+  loginHelpImageAlt: string;
   password: string;
   submitted = false;
   errorMessage: string = undefined;
@@ -36,7 +38,9 @@ export class LabarchivesLoginField extends FieldBase<any> {
     this.loginLabel =  options['loginLabel'] || 'Login';
     this.helpLoginLabel =  options['helpLoginLabel'] || '';
     this.helpLoginLabelList = options['helpLoginLabelList'] || [];
-    this.closeLabel = 'Close';
+    this.loginHelpImageAlt =  options['loginHelpImageAlt'] || 'labarchives help login';
+    this.loginHelpImage = options['loginHelpImage'] || this.loginHelpImageAlt;
+    this.closeLabel = options['closeLabel'] || 'Close';
     this.labarchivesService = this.getFromInjector(LabarchivesService);
   }
 
@@ -108,6 +112,9 @@ export class LabarchivesLoginField extends FieldBase<any> {
             <ul>
               <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
             </ul>
+            <p>
+              <img alt="{{ field.loginHelpImageAlt }}" [src]="field.loginHelpImage"/>
+            </p>
           </div>
           <div class="alert alert-danger" *ngIf="field.errorMessage">{{ field.errorMessage }}</div>
           <div>

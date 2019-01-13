@@ -45,7 +45,10 @@ module.exports = {
           'Come back to this screen',
           'Enter your UTS email address',
           'Paste the password token you copied above into LabArchives Password Token for External applications.'
-        ]
+        ],
+        loginHelpImageAlt: 'labarchives help login',
+        loginHelpImage: '/angular/labarchives/assets/images/labarchives-help-login.png',
+        closeLabel: 'Close'
       }
     },
     {
