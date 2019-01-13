@@ -32,7 +32,20 @@ module.exports = {
       class: 'LabarchivesLoginField',
       viewOnly: false,
       definition: {
-        name: 'Login'
+        name: 'Login',
+        loginLabel: 'Login',
+        usernameLabel: 'UTS email address',
+        passwordLabel: 'LabArchives Password Token for External applications',
+        helpLoginLabel: 'To get your Lab Archives token:',
+        helpLoginLabelList: [
+          'Log in to LabArchives',
+          'In the top right, choose the user menu (with your name on it) ',
+          'Select LA App authentication',
+          'Copy the token from Use this password',
+          'Come back to this screen',
+          'Enter your UTS email address',
+          'Paste the password token you copied above into LabArchives Password Token for External applications.'
+        ]
       }
     },
     {

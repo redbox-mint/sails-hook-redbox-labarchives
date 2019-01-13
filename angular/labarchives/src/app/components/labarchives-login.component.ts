@@ -11,10 +11,13 @@ export class LabarchivesLoginField extends FieldBase<any> {
 
   valid = true;
   username: string;
-  usernameLabel: string = 'Username';
+  columns: object[];
+  usernameLabel: string;
+  passwordLabel: string;
+  loginLabel: string;
+  helpLoginLabel: string;
+  helpLoginLabelList: object[];
   password: string;
-  passwordLabel: string = 'Password';
-
   submitted = false;
   errorMessage: string = undefined;
   closeLabel: string;
@@ -27,6 +30,12 @@ export class LabarchivesLoginField extends FieldBase<any> {
 
   constructor(options: any, injector: any) {
     super(options, injector);
+    this.columns = options['columns'] || [];
+    this.usernameLabel = options['usernameLabel'] || 'Username';
+    this.passwordLabel = options['passwordLabel'] || 'Password';
+    this.loginLabel =  options['loginLabel'] || 'Login';
+    this.helpLoginLabel =  options['helpLoginLabel'] || '';
+    this.helpLoginLabelList = options['helpLoginLabelList'] || [];
     this.closeLabel = 'Close';
     this.labarchivesService = this.getFromInjector(LabarchivesService);
   }
@@ -87,14 +96,18 @@ export class LabarchivesLoginField extends FieldBase<any> {
           <div class="form-row">
             <p>
               <button (click)="field.login(form.value)" type="submit" [disabled]="!field.valid" class="btn btn-primary">
-                Login via KEY
+                {{ field.loginLabel }}
               </button>
-              or
-              <button (click)="field.loginViaInstitution()" type="submit" [disabled]="!field.valid"
-                      class="btn btn-info">
-                Login trough UTS
-              </button>
+              <!--or-->
+              <!--<button (click)="field.loginViaInstitution()" type="submit" [disabled]="!field.valid"-->
+                      <!--class="btn btn-info">-->
+                <!--Login trough UTS-->
+              <!--</button>-->
             </p>
+            <p>{{ field.helpLoginLabel }}</p>
+            <ul>
+              <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
+            </ul>
           </div>
           <div class="alert alert-danger" *ngIf="field.errorMessage">{{ field.errorMessage }}</div>
           <div>
