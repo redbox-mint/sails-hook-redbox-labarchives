@@ -35,10 +35,10 @@ export class LabarchivesLoginField extends FieldBase<any> {
     this.columns = options['columns'] || [];
     this.usernameLabel = options['usernameLabel'] || 'Username';
     this.passwordLabel = options['passwordLabel'] || 'Password';
-    this.loginLabel =  options['loginLabel'] || 'Login';
-    this.helpLoginLabel =  options['helpLoginLabel'] || '';
+    this.loginLabel = options['loginLabel'] || 'Login';
+    this.helpLoginLabel = options['helpLoginLabel'] || '';
     this.helpLoginLabelList = options['helpLoginLabelList'] || [];
-    this.loginHelpImageAlt =  options['loginHelpImageAlt'] || 'labarchives help login';
+    this.loginHelpImageAlt = options['loginHelpImageAlt'] || 'labarchives help login';
     this.loginHelpImage = options['loginHelpImage'] || this.loginHelpImageAlt;
     this.closeLabel = options['closeLabel'] || 'Close';
     this.labarchivesService = this.getFromInjector(LabarchivesService);
@@ -85,7 +85,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
   selector: 'ws-labarchiveslogin',
   template: `
     <div class="row">
-      <div *ngIf="!field.loggedIn" class="col-md-5 col-md-offset-2">
+      <div *ngIf="!field.loggedIn" class="col-md-6 col-md-offset-2">
         <form #form="ngForm">
           <div class="form-group">
             <label>{{ field.usernameLabel }}</label>
@@ -104,23 +104,30 @@ export class LabarchivesLoginField extends FieldBase<any> {
               </button>
               <!--or-->
               <!--<button (click)="field.loginViaInstitution()" type="submit" [disabled]="!field.valid"-->
-                      <!--class="btn btn-info">-->
-                <!--Login trough UTS-->
+              <!--class="btn btn-info">-->
+              <!--Login trough UTS-->
               <!--</button>-->
             </p>
-            <p>{{ field.helpLoginLabel }}</p>
-            <ul>
-              <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
-            </ul>
-            <p>
-              <img alt="{{ field.loginHelpImageAlt }}" [src]="field.loginHelpImage"/>
-            </p>
           </div>
-          <div class="alert alert-danger" *ngIf="field.errorMessage">{{ field.errorMessage }}</div>
+          <div class="form-row">
+            <div class="alert alert-danger" *ngIf="field.errorMessage">{{ field.errorMessage }}</div>
+          </div>
           <div>
             <p></p>
           </div>
         </form>
+        <div *ngIf="!field.loggedIn" class="col-md-12">
+          <div class="form-row col-md-6">
+            <p>{{ field.helpLoginLabel }}</p>
+            <ul>
+              <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
+            </ul>
+            <div class="form-row col-md-6">
+              <img alt="{{ field.loginHelpImageAlt }}" [src]="field.loginHelpImage"
+                   style="padding: 4px; border: dotted 1px #ccc;"/>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="institutionModal" class="modal fade">
