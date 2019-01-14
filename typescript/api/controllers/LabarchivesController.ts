@@ -140,8 +140,8 @@ export module Controllers {
           metadataContent = `
           <div id="${workspace.oid}">      
             <h1>UTS</h1>             
-            <h3>Workspace <strong>${nbName}</strong> is registered to:</h3>                       
-            <h2>Data Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>            
+            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>                       
+            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>            
             <p>Stash Id: ${workspace.oid}</p>   
           </div>
           `;

@@ -115,10 +115,8 @@ var Controllers;
                 metadataContent = `
           <div id="${workspace.oid}">      
             <h1>UTS</h1>             
-            <h2>Workspace <strong>${nbName}</strong> is registered to:</h2>           
-            <p>
-              Data Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a>
-            </p>            
+            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>                       
+            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>            
             <p>Stash Id: ${workspace.oid}</p>   
           </div>
           `;
