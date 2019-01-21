@@ -63,4 +63,18 @@ export class LabarchivesService extends BaseService {
     }
   }
 
+  public async checkLink(rdmpId: string, nbId: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/checkLink';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {rdmp: rdmpId, nbId: nbId},
+        this.options
+      ).toPromise();
+      return Promise.resolve(this.extractData(result));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
 }

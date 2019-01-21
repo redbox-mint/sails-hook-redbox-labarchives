@@ -23,7 +23,8 @@ export module Controllers {
 
     protected _exportedMethods: any = [
       'login',
-      'link'
+      'link',
+      'checkLink'
     ];
     _config: any;
 
@@ -48,6 +49,7 @@ export module Controllers {
           const userInfo = response['users'];
           if (userInfo) {
             info = new UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname'], userInfo['notebooks']);
+            sails.log.debug(info);
             return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
           } else {
             console.log(response);
@@ -75,6 +77,30 @@ export module Controllers {
         const message = 'Input username and password';
         this.ajaxFail(req, res, message, {status: false, message: message});
       }
+    }
+
+    list(req, res) {
+      sails.log.debug('list');
+      const userId = req.user.id;
+      this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+      let info = {};
+      return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+        .flatMap(response => {
+          const user = response['users'] || null;
+          if (user) {
+            const userInfo = LabarchivesService.userInfo(this.config.key, user['id']);
+            return Observable.fromPromise(userInfo);
+          } else {
+            return Observable.throw('');
+          }
+        })
+        .subscribe(response => {
+          this.ajaxOk(req, res, null, {status: true, labUser: response, message: 'list'});
+        }, error => {
+          sails.log.error('list: error');
+          sails.log.error(error);
+          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+        });
     }
 
     link(req, res) {
@@ -170,7 +196,43 @@ export module Controllers {
         });
     }
 
-
+    checkLink(req, res) {
+      sails.log.debug('checkLink');
+      const userId = req.user.id;
+      const username = req.user.username;
+      const rdmp = req.param('rdmp');
+      const nbId = req.param('nbId');
+      const workspace = req.param('workspace');
+      let info = {};
+      let check = {
+        link: ''
+      };
+      this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+      return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+        .flatMap(response => {
+          info = response.info;
+          const nbTree = LabarchivesService.getNotebookTree(this.config.key, info['id'], nbId, 0);
+          return Observable.fromPromise(nbTree);
+        })
+        .subscribe(response => {
+          if (response['tree-tools'] && response['tree-tools']['level-nodes']) {
+            const lvlNodes = response['tree-tools']['level-nodes'];
+            const nodes = lvlNodes['level-node'];
+            if (Array.isArray(nodes)) {
+              nodes.map(node => {
+                if (node['display-text'] === 'stash.workspace') {
+                  check.link = 'linked';
+                }
+              });
+            }
+          }
+          this.ajaxOk(req, res, null, {status: true, check: check, message: 'checkLink'});
+        }, error => {
+          sails.log.error('checkLink: error');
+          sails.log.error(error);
+          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+        });
+    }
   }
 }
 module.exports = new Controllers.LabarchivesController().exports();

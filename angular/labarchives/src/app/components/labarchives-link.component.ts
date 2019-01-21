@@ -124,14 +124,8 @@ export class LabarchivesLinkField extends FieldBase<any> {
             <p *ngFor="let item of field.workspaceDefinition">{{ item.label }} :
               {{ field.currentWorkspace[item.name]}}</p>
             <h5>{{ field.processingLabel }}</h5>
-            <p>{{ field.processingMessage }}&nbsp;<span
-              *ngIf="field.checks.master; then isDone; else isSpinning"></span></p>
-            <p *ngIf="field.checks.comparing">{{ field.comparingLabel }}&nbsp;<span
-              *ngIf="field.checks.link; then isDone; else isSpinning"></span></p>
-            <p *ngIf="field.checks.link == false">{{ field.statusLabel }}&nbsp;<span
-              *ngIf="field.checks.rdmp; then isDone; else isSpinning"></span></p>
+            <p>{{ field.processingMessage }}&nbsp;</p>
             <p class="alert alert-success" *ngIf="field.checks.linkCreated">{{ field.processingSuccess }}</p>
-            <p class="alert alert-danger" *ngIf="field.checks.linkWithOther">{{ field.processingFail }}</p>
             <p class="alert alert-danger" *ngIf="field.processingStatus === 'done' && field.processingFail">
               {{ field.processingFail }}</p>
             <ng-template #isDone>

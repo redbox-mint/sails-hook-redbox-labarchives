@@ -24,6 +24,7 @@
   "author": "Moises Sacal",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@types/node": "^10.12.18",
     "@types/lodash": "^4.14.118",
     "mocha": "^5.1.1",
     "sails": "^1.0.2",

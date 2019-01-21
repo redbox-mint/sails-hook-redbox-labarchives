@@ -2,6 +2,7 @@ import {Output, EventEmitter, Component, OnInit, Inject, Injector, Input} from '
 import {FormGroup, FormControl, Validators, NgForm} from '@angular/forms';
 import {SimpleComponent} from '../shared/form/field-simple.component';
 import {FieldBase} from '../shared/form/field-base';
+import {LabarchivesService} from "../labarchives.service";
 
 export class LabarchivesListField extends FieldBase<any> {
 
@@ -12,40 +13,59 @@ export class LabarchivesListField extends FieldBase<any> {
   rdmpLinkLabel: string;
 
   loading: boolean;
+  labUser: any = {};
   rdmp: string;
   workspaces: any;
+  linkedLabel: string;
+  linkedAnotherLabel: string;
+  linkLabel: string;
+  linkProblem: string;
 
   @Input() user: any;
   @Output() link: EventEmitter<any> = new EventEmitter<any>();
 
+  labarchivesService: LabarchivesService;
+
   constructor(options: any, injector: any) {
     super(options, injector);
+    this.labarchivesService = this.getFromInjector(LabarchivesService);
     this.columns = [
       {'label': 'Name', 'property': 'name'},
-      {'label': 'Default', 'property': 'isDefault'},
-      {'label': 'Location', 'property': 'web_url', 'link': 'true'}
+      {'label': 'Default', 'property': 'isDefault'}
     ];
     this.rdmpLinkLabel = 'Plan';
     this.syncLabel = 'Sync';
+    this.linkedLabel = options['linkedLabel'] || 'Linked';
+    this.linkedAnotherLabel = options['linkedAnotherLabel'] || 'Linked to another workspace';
+    this.linkLabel = options['linkLabel'] || 'Link Workspace';
+    this.linkProblem = options['linkProblem'] || 'There was a problem checking the link';
   }
 
   registerEvents() {
-    this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
+    this.fieldMap['Login'].field['userLogin'].subscribe(this.bindUser.bind(this));
     //this.fieldMap['Link'].field['linkItem'].subscribe(this.listWorkspaces.bind(this));
   }
 
-  listWorkspaces(labUser: any) {
+  bindUser(labUser: any) {
+    console.log(labUser);
     if (labUser && labUser.notebooks) {
-      this.workspaces = labUser.notebooks.map((nb) => {
+      this.labUser = labUser;
+      this.listWorkspaces();
+    }
+  }
+
+  listWorkspaces() {
+    if (this.labUser && this.labUser.notebooks) {
+      this.workspaces = this.labUser.notebooks.map((nb) => {
         const isDefault = nb['isDefault'] ? 'default' : '';
         return {
           id: nb['id'],
           name: nb['name'],
-          description: isDefault,
-          web_url: '',
+          isDefault: isDefault ? 'Default Notebook' : '',
           rdmp: {info: ''}
         }
       });
+      this.checkLinks();
     } else {
       this.workspaces = [];
     }
@@ -55,6 +75,29 @@ export class LabarchivesListField extends FieldBase<any> {
     this.link.emit(item);
   }
 
+  checkLinks() {
+    //this.workspaces[index]['linkedState'] == 'check'; // Possible values: linked, another, link
+    this.workspaces.map((w, index) => {
+      this.labarchivesService.checkLink(this.rdmp, w['id'])
+        .then((response) => {
+          if (!response.status) {
+            throw new Error('Error checking workspace');
+          } else {
+            const check = response['check'];
+             console.log(check);
+            if (check['link'] === 'linked') {
+              this.workspaces[index]['linkedState'] = 'linked';
+            } else {
+              this.workspaces[index]['linkedState'] = 'link';
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          this.workspaces[index]['linkedState'] = 'problem';
+        });
+    });
+  }
 
 }
 
@@ -63,7 +106,7 @@ export class LabarchivesListField extends FieldBase<any> {
   selector: 'ws-labarchiveslist',
   template: `
     <div class="row">
-      <div *ngIf="field.workspaces" class="col-lg-10">
+      <div *ngIf="field.workspaces" class="col-lg-12">
         <div class="">
           <table class="table">
             <thead>
@@ -87,15 +130,26 @@ export class LabarchivesListField extends FieldBase<any> {
                 </td>
               </ng-container>
               <td>
-                  <span *ngIf="item.rdmp.info && item.rdmp.info.rdmp; else isNotLinked ">
-                    <button disabled type="button" class="btn btn-success btn-block"
-                            *ngIf="item.rdmp.info.rdmp === field.rdmp"> Linked </button>
-                    <button disabled type="button" class="btn btn-info btn-block"
-                            *ngIf="item.rdmp.info.rdmp != field.rdmp"> Linked to another RDMP</button>
-                  </span>
-                <ng-template #isNotLinked>
-                  <button type="button" class="btn btn-info btn-block" (click)="field.linkWorkspace(item)">Link</button>
-                </ng-template>
+                <span *ngIf="!item['linkedState']">
+                  <button type="button" disabled class="btn btn-info btn-block" [name]="item['@id']">
+                    <span><i class="fa fa-spinner fa-spin"></i></span></button>
+                </span>
+                <span *ngIf="item['linkedState'] === 'linked'">
+                  <button type="button" disabled class="btn btn-success btn-block"
+                          [name]="item['@id']">{{ field.linkedLabel }}</button>
+                </span>
+                <span *ngIf="item['linkedState'] === 'another'">
+                  <button type="button" disabled class="btn btn-info btn-block"
+                          [name]="item['@id']">{{ field.linkedAnotherLabel }}</button>
+                </span>
+                <span *ngIf="item['linkedState'] === 'link'">
+                  <button type="button" class="btn btn-info btn-block" [name]="item['@id']"
+                          (click)="field.linkWorkspace(item)">{{ field.linkLabel }}</button>
+                </span>
+                <span *ngIf="item['linkedState'] === 'problem'">
+                  <button type="button" disabled class="btn btn-warning btn-block"
+                          [name]="item['@id']">{{ field.linkProblem }}</button>
+                </span>
               </td>
             </tr>
             </tbody>
@@ -121,4 +175,9 @@ export class LabarchivesListComponent extends SimpleComponent {
   ngOnInit() {
     this.field.registerEvents();
   }
+
+  ngAfterContentInit() {
+    this.field.listWorkspaces();
+  }
+
 }
