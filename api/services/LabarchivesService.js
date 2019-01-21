@@ -19,7 +19,9 @@ var Services;
             this._exportedMethods = [
                 'login',
                 'insertNode',
-                'addEntry'
+                'addEntry',
+                'getNotebookInfo',
+                'getNotebookTree'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
         }
@@ -58,6 +60,36 @@ var Services;
                 try {
                     if (key && key['akid'] && key['password']) {
                         return yield la.addEntry(key, userId, nbId, treeId, partType, metadata);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        getNotebookInfo(key, userId, nbId) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.getNotebookInfo(key, userId, nbId);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        getNotebookTree(key, userId, nbId, treeLevel = 0) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.getTree(key, userId, nbId, treeLevel);
                     }
                     else {
                         return Promise.reject(new Error('missing keys for accessing lab archives APIs'));

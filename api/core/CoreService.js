@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Rx_1 = require("rxjs/Rx");
+const _ = require('lodash');
 var Services;
 (function (Services) {
     var Core;
@@ -43,26 +44,6 @@ var Services;
                     }
                 }
                 return exportedMethods;
-            }
-            metTriggerCondition(oid, record, options) {
-                const triggerCondition = _.get(options, "triggerCondition", "");
-                const forceRun = _.get(options, "forceRun", false);
-                const variables = {
-                    imports: {
-                        record: record,
-                        oid: oid
-                    }
-                };
-                if (!_.isUndefined(triggerCondition) && !_.isEmpty(triggerCondition)) {
-                    const compiled = _.template(triggerCondition, variables);
-                    return compiled();
-                }
-                else if (forceRun) {
-                    return "true";
-                }
-                else {
-                    return "false";
-                }
             }
         }
         Core.Service = Service;

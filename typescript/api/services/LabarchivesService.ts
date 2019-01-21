@@ -1,6 +1,4 @@
 import {Sails, Model} from 'sails';
-import {Observable} from 'rxjs/Observable';
-import * as requestPromise from 'request-promise';
 
 import * as la from '@uts-eresearch/provision-labarchives';
 
@@ -19,7 +17,9 @@ export module Services {
     protected _exportedMethods: any = [
       'login',
       'insertNode',
-      'addEntry'
+      'addEntry',
+      'getNotebookInfo',
+      'getNotebookTree'
     ];
 
     constructor() {
@@ -65,6 +65,30 @@ export module Services {
         return Promise.reject(new Error(e));
       }
 
+    }
+
+    async getNotebookInfo(key: any, userId: string, nbId: string) {
+      try {
+        if (key && key['akid'] && key['password']) {
+          return await la.getNotebookInfo(key, userId, nbId);
+        } else {
+          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
+    }
+
+    async getNotebookTree(key: any, userId: string, nbId: string, treeLevel: number = 0) {
+      try {
+        if (key && key['akid'] && key['password']) {
+          return await la.getTree(key, userId, nbId, treeLevel);
+        } else {
+          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
     }
   }
 }
