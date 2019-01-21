@@ -31,7 +31,7 @@ module.exports = {
       appId: 'labarchives',
       recordType: 'labarchives',
       workspaceFileName: 'README.md',
-      key: {"akid": "utech_sydney", "password": "***REMOVED***"}
+      key: {"akid": "utech_sydney", "password": ***REMOVED***}
     }
   }
 };
