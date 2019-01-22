@@ -19,7 +19,7 @@ module.exports = {
 
   workspaces: {
     portal: {
-      authorization: 'Bearer c81bd0a3-56fb-448e-bfa5-a5b7abb3668e'
+      authorization: 'Bearer TOKEN'
     },
     provisionerUser: 'admin',
     parentRecord: 'rdmp',
@@ -31,7 +31,7 @@ module.exports = {
       appId: 'labarchives',
       recordType: 'labarchives',
       workspaceFileName: 'README.md',
-      key: {"akid": "utech_sydney", "password": ***REMOVED***}
+      key: {"akid": "USER", "password": "PASSWORD"}
     }
   }
 };
