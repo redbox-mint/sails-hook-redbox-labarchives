@@ -24,7 +24,8 @@ export module Controllers {
     protected _exportedMethods: any = [
       'login',
       'link',
-      'checkLink'
+      'checkLink',
+      'list'
     ];
     _config: any;
 
@@ -63,7 +64,6 @@ export module Controllers {
             return WorkspaceService.createWorkspaceInfo(userId, this.config.appName, info);
           }
         }).subscribe(response => {
-
           const data = {status: true, login: true};
           this.ajaxOk(req, res, null, {status: true, labUser: info});
         }, error => {
@@ -85,16 +85,18 @@ export module Controllers {
       let info = {};
       return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
         .flatMap(response => {
-          const user = response['users'] || null;
+          const user = response['info'] || null;
           if (user) {
-            const userInfo = LabarchivesService.userInfo(this.config.key, user['id']);
+            const userInfo = LabarchivesService.userInfo(this.config.key, user['id'], true);
             return Observable.fromPromise(userInfo);
           } else {
-            return Observable.throw('');
+            return Observable.throwError('cannot get user info');
           }
         })
         .subscribe(response => {
-          this.ajaxOk(req, res, null, {status: true, labUser: response, message: 'list'});
+          const notebooks = response['users']['notebooks'];
+          sails.log.debug(notebooks);
+          this.ajaxOk(req, res, null, {status: true, notebooks: notebooks, message: 'list'});
         }, error => {
           sails.log.error('list: error');
           sails.log.error(error);

@@ -13,7 +13,8 @@ var Controllers;
             this._exportedMethods = [
                 'login',
                 'link',
-                'checkLink'
+                'checkLink',
+                'list'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
         }
@@ -66,17 +67,19 @@ var Controllers;
             let info = {};
             return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
                 .flatMap(response => {
-                const user = response['users'] || null;
+                const user = response['info'] || null;
                 if (user) {
-                    const userInfo = LabarchivesService.userInfo(this.config.key, user['id']);
+                    const userInfo = LabarchivesService.userInfo(this.config.key, user['id'], true);
                     return rxjs_1.Observable.fromPromise(userInfo);
                 }
                 else {
-                    return rxjs_1.Observable.throw('');
+                    return rxjs_1.Observable.throwError('cannot get user info');
                 }
             })
                 .subscribe(response => {
-                this.ajaxOk(req, res, null, { status: true, labUser: response, message: 'list' });
+                const notebooks = response['users']['notebooks'];
+                sails.log.debug(notebooks);
+                this.ajaxOk(req, res, null, { status: true, notebooks: notebooks, message: 'list' });
             }, error => {
                 sails.log.error('list: error');
                 sails.log.error(error);

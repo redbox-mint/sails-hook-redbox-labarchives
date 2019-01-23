@@ -18,6 +18,7 @@ var Services;
             super();
             this._exportedMethods = [
                 'login',
+                'userInfo',
                 'insertNode',
                 'addEntry',
                 'getNotebookInfo',
@@ -30,6 +31,21 @@ var Services;
                 try {
                     if (key && key['akid'] && key['password']) {
                         return yield la.accessInfo(key, username, password);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        userInfo(key, userId) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.userInfoViaId(key, userId);
                     }
                     else {
                         return Promise.reject(new Error('missing keys for accessing lab archives APIs'));

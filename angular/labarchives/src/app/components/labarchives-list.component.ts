@@ -6,6 +6,8 @@ import {LabarchivesService} from "../labarchives.service";
 
 export class LabarchivesListField extends FieldBase<any> {
 
+  loggedIn: boolean;
+
   columns: any;
   syncLabel: any;
   accessDeniedObjects: any = [];
@@ -23,6 +25,7 @@ export class LabarchivesListField extends FieldBase<any> {
 
   @Input() user: any;
   @Output() link: EventEmitter<any> = new EventEmitter<any>();
+  @Output() checkLoggedIn: EventEmitter<any> = new EventEmitter<any>();
 
   labarchivesService: LabarchivesService;
 
@@ -46,6 +49,10 @@ export class LabarchivesListField extends FieldBase<any> {
     //this.fieldMap['Link'].field['linkItem'].subscribe(this.listWorkspaces.bind(this));
   }
 
+  init() {
+    this.rdmp = this.fieldMap._rootComp.rdmp;
+  }
+
   bindUser(labUser: any) {
     console.log(labUser);
     if (labUser && labUser.notebooks) {
@@ -55,8 +62,10 @@ export class LabarchivesListField extends FieldBase<any> {
   }
 
   listWorkspaces() {
-    if (this.labUser && this.labUser.notebooks) {
-      this.workspaces = this.labUser.notebooks.map((nb) => {
+    this.labarchivesService.list().then(response => {
+      this.loggedIn = this.fieldMap._rootComp.loggedIn = true;
+      this.checkLoggedIn.emit(true);
+      this.workspaces = response.map((nb) => {
         const isDefault = nb['isDefault'] ? 'default' : '';
         return {
           id: nb['id'],
@@ -66,9 +75,10 @@ export class LabarchivesListField extends FieldBase<any> {
         }
       });
       this.checkLinks();
-    } else {
+    }).catch(error => {
       this.workspaces = null;
-    }
+      this.checkLoggedIn.emit(false);
+    })
   }
 
   linkWorkspace(item: any) {
@@ -84,7 +94,7 @@ export class LabarchivesListField extends FieldBase<any> {
             throw new Error('Error checking workspace');
           } else {
             const check = response['check'];
-             console.log(check);
+            console.log(check);
             if (check['link'] === 'linked') {
               this.workspaces[index]['linkedState'] = 'linked';
             } else {

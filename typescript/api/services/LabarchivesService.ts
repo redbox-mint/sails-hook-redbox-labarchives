@@ -16,6 +16,7 @@ export module Services {
 
     protected _exportedMethods: any = [
       'login',
+      'userInfo',
       'insertNode',
       'addEntry',
       'getNotebookInfo',
@@ -39,7 +40,20 @@ export module Services {
       }
 
     }
+    async userInfo(key: any, userId: string) {
+      try {
+        if (key && key['akid'] && key['password']) {
+          return await la.userInfoViaId(key, userId);
+        } else {
+          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
 
+    }
+
+    userInfoViaId
     async insertNode(key: any, userId: string, nbId: string, displayText) {
       try {
         if (key && key['akid'] && key['password']) {

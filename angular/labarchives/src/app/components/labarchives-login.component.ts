@@ -29,6 +29,8 @@ export class LabarchivesLoginField extends FieldBase<any> {
   labarchivesService: LabarchivesService;
 
   @Output() userLogin = new EventEmitter<any>();
+  @Output() listWorkspaces: EventEmitter<any> = new EventEmitter<any>();
+
 
   constructor(options: any, injector: any) {
     super(options, injector);
@@ -42,6 +44,14 @@ export class LabarchivesLoginField extends FieldBase<any> {
     this.loginHelpImage = options['loginHelpImage'] || this.loginHelpImageAlt;
     this.closeLabel = options['closeLabel'] || 'Close';
     this.labarchivesService = this.getFromInjector(LabarchivesService);
+  }
+
+  registerEvents() {
+    this.fieldMap['List'].field['checkLoggedIn'].subscribe(this.checkLogin.bind(this));
+  }
+
+  checkLogin(status: boolean) {
+    this.loggedIn = this.fieldMap._rootComp.loggedIn = status;
   }
 
   async login(form) {
@@ -151,5 +161,6 @@ export class LabarchivesLoginComponent extends SimpleComponent {
   field: LabarchivesLoginField;
 
   ngOnInit() {
+    this.field.registerEvents();
   }
 }
