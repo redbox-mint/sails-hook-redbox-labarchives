@@ -35,7 +35,7 @@ module.exports = {
         name: 'Login',
         loginLabel: 'Login',
         usernameLabel: 'UTS email address',
-        passwordLabel: 'LabArchives Password Token for External applications',
+        passwordLabel: 'LabArchives password token for external applications',
         helpLoginLabel: 'To get your Lab Archives password token:',
         helpLoginLabelList: [
           'Log in to LabArchives',
@@ -44,7 +44,7 @@ module.exports = {
           'Copy the token from Use this password',
           'Come back to this screen',
           'Enter your UTS email address',
-          'Paste the password token you copied above into LabArchives Password Token for External applications.'
+          'Paste the password token you copied above into LabArchives password token for external applications.'
         ],
         loginHelpImageAlt: 'labarchives help login',
         loginHelpImage: '/angular/labarchives/assets/images/labarchives-help-login.png',

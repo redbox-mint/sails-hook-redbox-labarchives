@@ -85,7 +85,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
   selector: 'ws-labarchiveslogin',
   template: `
     <div class="row">
-      <div *ngIf="!field.loggedIn" class="col-md-6 col-md-offset-2">
+      <div *ngIf="!field.loggedIn" class="col-md-6">
         <form #form="ngForm">
           <div class="form-group">
             <label>{{ field.usernameLabel }}</label>
@@ -116,16 +116,16 @@ export class LabarchivesLoginField extends FieldBase<any> {
             <p></p>
           </div>
         </form>
-        <div *ngIf="!field.loggedIn" class="col-md-12">
+      </div>
+      <div *ngIf="!field.loggedIn" class="col-md-6">
+        <div class="form-row">
+          <p>{{ field.helpLoginLabel }}</p>
+          <ul>
+            <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
+          </ul>
           <div class="form-row col-md-6">
-            <p>{{ field.helpLoginLabel }}</p>
-            <ul>
-              <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
-            </ul>
-            <div class="form-row col-md-6">
-              <img alt="{{ field.loginHelpImageAlt }}" [src]="field.loginHelpImage"
-                   style="padding: 4px; border: dotted 1px #ccc;"/>
-            </div>
+            <img alt="{{ field.loginHelpImageAlt }}" [src]="field.loginHelpImage"
+                 style="padding: 4px; border: dotted 1px #ccc;"/>
           </div>
         </div>
       </div>

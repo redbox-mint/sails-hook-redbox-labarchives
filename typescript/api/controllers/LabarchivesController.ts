@@ -52,7 +52,6 @@ export module Controllers {
             sails.log.debug(info);
             return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
           } else {
-            console.log(response);
             //Doing this because if the password is incorrect labarchives returns a 404!
             const message = 'username and password invalid';
             throw new Error(message);
@@ -159,8 +158,6 @@ export module Controllers {
 
         })
         .flatMap(response => {
-          sails.log.debug('insertNode');
-          sails.log.debug(response);
           if (response && response['tree-tools']) {
             const tree = response['tree-tools'];
             const node = tree['node'];
@@ -199,7 +196,6 @@ export module Controllers {
     }
 
     checkLink(req, res) {
-      sails.log.debug('checkLink');
       const userId = req.user.id;
       const username = req.user.username;
       const rdmp = req.param('rdmp');

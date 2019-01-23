@@ -35,7 +35,6 @@ var Controllers;
                         return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
                     }
                     else {
-                        console.log(response);
                         const message = 'username and password invalid';
                         throw new Error(message);
                     }
@@ -134,8 +133,6 @@ var Controllers;
                 return rxjs_1.Observable.fromPromise(insertNode);
             })
                 .flatMap(response => {
-                sails.log.debug('insertNode');
-                sails.log.debug(response);
                 if (response && response['tree-tools']) {
                     const tree = response['tree-tools'];
                     const node = tree['node'];
@@ -173,7 +170,6 @@ var Controllers;
             });
         }
         checkLink(req, res) {
-            sails.log.debug('checkLink');
             const userId = req.user.id;
             const username = req.user.username;
             const rdmp = req.param('rdmp');

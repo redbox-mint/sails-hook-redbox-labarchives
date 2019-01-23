@@ -67,7 +67,7 @@ export class LabarchivesListField extends FieldBase<any> {
       });
       this.checkLinks();
     } else {
-      this.workspaces = [];
+      this.workspaces = null;
     }
   }
 
