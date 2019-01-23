@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Rx_1 = require("rxjs/Rx");
+const rxjs_1 = require("rxjs");
 require("rxjs/add/operator/map");
 const controller = require("../core/CoreController");
 const Config_1 = require("../Config");
@@ -27,7 +27,7 @@ var Controllers;
                 const userId = req.user.id;
                 this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
                 const userInfo = LabarchivesService.login(this.config.key, user.username, user.password);
-                Rx_1.Observable.fromPromise(userInfo).flatMap(response => {
+                rxjs_1.Observable.fromPromise(userInfo).flatMap(response => {
                     const userInfo = response['users'];
                     if (userInfo) {
                         info = new UserInfo_1.UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname'], userInfo['notebooks']);
@@ -70,10 +70,10 @@ var Controllers;
                 const user = response['users'] || null;
                 if (user) {
                     const userInfo = LabarchivesService.userInfo(this.config.key, user['id']);
-                    return Rx_1.Observable.fromPromise(userInfo);
+                    return rxjs_1.Observable.fromPromise(userInfo);
                 }
                 else {
-                    return Rx_1.Observable.throw('');
+                    return rxjs_1.Observable.throw('');
                 }
             })
                 .subscribe(response => {
@@ -131,14 +131,15 @@ var Controllers;
                 .flatMap(response => {
                 workspace = response;
                 const insertNode = LabarchivesService.insertNode(this.config.key, info['id'], nbId, 'stash.workspace', false);
-                return Rx_1.Observable.fromPromise(insertNode);
+                return rxjs_1.Observable.fromPromise(insertNode);
             })
                 .flatMap(response => {
                 sails.log.debug('insertNode');
                 sails.log.debug(response);
-                const tree = response['tree-tools'];
-                const node = tree['node'];
-                metadataContent = `
+                if (response && response['tree-tools']) {
+                    const tree = response['tree-tools'];
+                    const node = tree['node'];
+                    metadataContent = `
           <div id="${workspace.oid}">      
             <h1>UTS</h1>             
             <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>                       
@@ -146,9 +147,12 @@ var Controllers;
             <p>Stash Id: ${workspace.oid}</p>   
           </div>
           `;
-                const partType = 'text entry';
-                const insertNode = LabarchivesService.addEntry(this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent);
-                return Rx_1.Observable.fromPromise(insertNode);
+                    const partType = 'text entry';
+                    const insertNode = LabarchivesService.addEntry(this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent);
+                    return rxjs_1.Observable.fromPromise(insertNode);
+                }
+                else
+                    return rxjs_1.Observable.throwError(new Error('cannot insert node'));
             })
                 .flatMap(response => {
                 if (recordMetadata.workspaces) {
@@ -184,7 +188,7 @@ var Controllers;
                 .flatMap(response => {
                 info = response.info;
                 const nbTree = LabarchivesService.getNotebookTree(this.config.key, info['id'], nbId, 0);
-                return Rx_1.Observable.fromPromise(nbTree);
+                return rxjs_1.Observable.fromPromise(nbTree);
             })
                 .subscribe(response => {
                 if (response['tree-tools'] && response['tree-tools']['level-nodes']) {

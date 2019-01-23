@@ -28,6 +28,7 @@ export class LabarchivesLinkField extends FieldBase<any> {
   processingSuccess: string;
   processingFail: string;
   processingStatus: string;
+  processingNoPermission: string;
 
   checks: Checks;
   rdmp: string;
@@ -41,15 +42,16 @@ export class LabarchivesLinkField extends FieldBase<any> {
     this.labarchivesService = this.getFromInjector(LabarchivesService);
     this.closeLabel = 'Close';
     this.processing = false;
-    this.workspaceDetailsTitle = 'Workspace Title';
+    this.workspaceDetailsTitle = 'Workspace';
     this.workspaceDefinition = '';
     this.currentWorkspace = {};
-    this.processingLabel = 'Processing...';
-    this.processingMessage = 'processing message';
+    this.processingLabel = options['processingLabel'] || 'Processing...';
+    this.processingMessage = '';
     this.checks = new Checks();
-    this.processingSuccess = 'Success';
-    this.processingFail = 'Failed';
+    this.processingSuccess = options['processingSuccess'] || 'Success';
+    this.processingFail = options['processingFail'] || 'There was a problem linking your workspace, please try again later';
     this.processingStatus = '';
+    this.processingNoPermission = options['processingNoPermission'] || 'You are not allowed to modify this item'
   }
 
   init() {
@@ -97,12 +99,13 @@ export class LabarchivesLinkField extends FieldBase<any> {
         this.checks.linkCreated = true;
         this.checks.master = true;
         this.processingFail = undefined;
-      } else {
+      } else if(link.message === 'cannot insert node'){
+        this.processingFail = this.processingNoPermission;
         this.checks.linkWithOther = true
       }
     } catch (e) {
       this.processing = false;
-      this.checks.linkWithOther = true
+      this.checks.linkWithOther = true;
     }
   }
 }
@@ -123,8 +126,8 @@ export class LabarchivesLinkField extends FieldBase<any> {
             <h5>{{ field.workspaceDetailsTitle }}</h5>
             <p *ngFor="let item of field.workspaceDefinition">{{ item.label }} :
               {{ field.currentWorkspace[item.name]}}</p>
-            <h5>{{ field.processingLabel }}</h5>
-            <p>{{ field.processingMessage }}&nbsp;</p>
+            <h5 *ngIf="field.processing">{{ field.processingLabel }}</h5>
+            <p *ngIf="field.processing">{{ field.processingMessage }}&nbsp;</p>
             <p class="alert alert-success" *ngIf="field.checks.linkCreated">{{ field.processingSuccess }}</p>
             <p class="alert alert-danger" *ngIf="field.processingStatus === 'done' && field.processingFail">
               {{ field.processingFail }}</p>

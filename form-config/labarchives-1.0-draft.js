@@ -55,14 +55,20 @@ module.exports = {
       class: 'LabarchivesListField',
       viewOnly: false,
       definition: {
-        name: 'List'
+        name: 'List',
+        linkedLabel: 'Linked with Stash'
       }
     },
     {
       class: 'LabarchivesLinkField',
       viewOnly: false,
       definition: {
-        name: 'Link'
+        name: 'Link',
+        processingLabel: 'Processing...',
+        processingSuccess: 'Your workspace was linked successfully',
+        processingFail: 'There was a problem linking your workspace, please try again later',
+        processingNoPermission: 'You do not have rights to modify this item',
+        closeLabel: 'Close',
       }
     },
     {

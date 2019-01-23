@@ -2,7 +2,7 @@ declare var module;
 declare var sails, Model;
 declare var _;
 
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs';
 import 'rxjs/add/operator/map';
 
 declare var BrandingService, WorkspaceService, LabarchivesService;
@@ -161,9 +161,10 @@ export module Controllers {
         .flatMap(response => {
           sails.log.debug('insertNode');
           sails.log.debug(response);
-          const tree = response['tree-tools'];
-          const node = tree['node'];
-          metadataContent = `
+          if (response && response['tree-tools']) {
+            const tree = response['tree-tools'];
+            const node = tree['node'];
+            metadataContent = `
           <div id="${workspace.oid}">      
             <h1>UTS</h1>             
             <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>                       
@@ -171,11 +172,12 @@ export module Controllers {
             <p>Stash Id: ${workspace.oid}</p>   
           </div>
           `;
-          const partType = 'text entry';
-          const insertNode = LabarchivesService.addEntry(
-            this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent
-          );
-          return Observable.fromPromise(insertNode);
+            const partType = 'text entry';
+            const insertNode = LabarchivesService.addEntry(
+              this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent
+            );
+            return Observable.fromPromise(insertNode);
+          } else return Observable.throwError(new Error('cannot insert node'));
         })
         .flatMap(response => {
           if (recordMetadata.workspaces) {
