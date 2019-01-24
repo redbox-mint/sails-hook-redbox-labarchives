@@ -32,7 +32,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@uts-eresearch/provision-labarchives": "git+https://code.research.uts.edu.au/eresearch/provision-labarchives.git",
+    "@uts-eresearch/provision-labarchives": "1.0.1",
     "lodash": "^4.17.11",
     "ncp": "^2.0.0",
     "path-exists": "^3.0.0",

@@ -76,7 +76,6 @@ var Controllers;
             })
                 .subscribe(response => {
                 const notebooks = response['users']['notebooks'];
-                sails.log.debug(notebooks);
                 this.ajaxOk(req, res, null, { status: true, notebooks: notebooks, message: 'list' });
             }, error => {
                 sails.log.error('list: error');
@@ -162,7 +161,6 @@ var Controllers;
                 return WorkspaceService.updateRecordMeta(this.config, recordMetadata, rdmp);
             })
                 .subscribe(response => {
-                sails.log.debug(response);
                 this.ajaxOk(req, res, null, { status: true, message: 'workspaceRecordCreated' });
             }, error => {
                 sails.log.error('link: error');
