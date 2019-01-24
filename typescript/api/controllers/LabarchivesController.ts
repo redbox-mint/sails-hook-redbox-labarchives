@@ -49,7 +49,7 @@ export module Controllers {
         Observable.fromPromise(userInfo).flatMap(response => {
           const userInfo = response['users'];
           if (userInfo) {
-            info = new UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname'], userInfo['notebooks']);
+            info = new UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname']);
             return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
           } else {
             //Doing this because if the password is incorrect labarchives returns a 404!
@@ -142,8 +142,8 @@ export module Controllers {
             rdmpOid: rdmp,
             rdmpTitle: rdmpTitle,
             title: nbName,
-            location: `https://au-mynotebook.labarchives.com`,
-            description: 'LabArchives Workspace',
+            location: this.config.location, //`https://au-mynotebook.labarchives.com`,
+            description: this.config.description, //'LabArchives Workspace',
             type: this.config.recordType
           };
           return WorkspaceService.createWorkspaceRecord(

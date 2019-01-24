@@ -89,4 +89,17 @@ export class LabarchivesService extends BaseService {
     }
   }
 
+  public async getUserInfo() {
+    const wsUrl = this.brandingAndPortalUrl + '/user/info';
+    try {
+      const result = await this.http.get(
+        wsUrl,
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
 }

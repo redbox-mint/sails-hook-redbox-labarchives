@@ -31,7 +31,7 @@ var Controllers;
                 rxjs_1.Observable.fromPromise(userInfo).flatMap(response => {
                     const userInfo = response['users'];
                     if (userInfo) {
-                        info = new UserInfo_1.UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname'], userInfo['notebooks']);
+                        info = new UserInfo_1.UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname']);
                         return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
                     }
                     else {
@@ -121,8 +121,8 @@ var Controllers;
                     rdmpOid: rdmp,
                     rdmpTitle: rdmpTitle,
                     title: nbName,
-                    location: `https://au-mynotebook.labarchives.com`,
-                    description: 'LabArchives Workspace',
+                    location: this.config.location,
+                    description: this.config.description,
                     type: this.config.recordType
                 };
                 return WorkspaceService.createWorkspaceRecord(this.config, username, record, this.config.recordType, this.config.workflowStage);

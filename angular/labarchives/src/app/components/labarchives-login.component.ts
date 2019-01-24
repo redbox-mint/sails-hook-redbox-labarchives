@@ -16,10 +16,13 @@ export class LabarchivesLoginField extends FieldBase<any> {
   usernameLabel: string;
   passwordLabel: string;
   loginLabel: string;
+  userLoginError: string;
+  userPasswordError: string;
   helpLoginLabel: string;
   helpLoginLabelList: object[];
   loginHelpImage: string;
   loginHelpImageAlt: string;
+  userEmail: string;
   password: string;
   submitted = false;
   errorMessage: string = undefined;
@@ -39,6 +42,8 @@ export class LabarchivesLoginField extends FieldBase<any> {
     this.columns = options['columns'] || [];
     this.usernameLabel = options['usernameLabel'] || 'Username';
     this.passwordLabel = options['passwordLabel'] || 'Password';
+    this.userLoginError = options['userLoginError'] || 'Please include username';
+    this.userPasswordError = options['userPasswordError'] || 'Please include password';
     this.loginLabel = options['loginLabel'] || 'Login';
     this.helpLoginLabel = options['helpLoginLabel'] || '';
     this.helpLoginLabelList = options['helpLoginLabelList'] || [];
@@ -50,6 +55,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
 
   registerEvents() {
     this.fieldMap['List'].field['checkLoggedIn'].subscribe(this.checkLogin.bind(this));
+    this.setUserEmail();
   }
 
   checkLogin(status: boolean) {
@@ -57,12 +63,18 @@ export class LabarchivesLoginField extends FieldBase<any> {
     this.loading = false;
   }
 
+  async setUserEmail() {
+    const userInfo = await this.labarchivesService.getUserInfo();
+    const user = userInfo['user'];
+    this.userEmail = user['email'];
+  }
+
   async login(form) {
     const formValid = this.loginValid(form);
     if (formValid === '') {
       // TODO: Investigate this. Using this method to remove the trailing Base64 equals ==
       form.password = form.password.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
-      this.user = {username: form.username, password: form.password};
+      this.user = {username: this.userEmail, password: form.password};
       const login = await this.labarchivesService.login(this.user.username, this.user.password);
       if (login.status) {
         this.loggedIn = true;
@@ -72,18 +84,17 @@ export class LabarchivesLoginField extends FieldBase<any> {
       } else {
         this.errorMessage = login.message;
       }
-
     } else {
       this.errorMessage = formValid;
     }
   }
 
   loginValid(form) {
-    if (!form.username) {
-      return 'Please include username';
+    if (!form.userEmail) {
+      return this.userLoginError;
     }
     if (!form.password) {
-      return 'Please include username';
+      return this.userPasswordError;
     }
     return '';
   }
@@ -102,7 +113,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
         <form #form="ngForm">
           <div class="form-group">
             <label>{{ field.usernameLabel }}</label>
-            <input type="text" class="form-control" ngModel name="username"
+            <input type="text" class="form-control" [(ngModel)]="field.userEmail" name="userEmail" ngModel
                    attr.aria-label="{{ field.usernameLabel }}">
           </div>
           <div class="form-group">

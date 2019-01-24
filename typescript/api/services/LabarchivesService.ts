@@ -40,6 +40,7 @@ export module Services {
       }
 
     }
+    
     async userInfo(key: any, userId: string) {
       try {
         if (key && key['akid'] && key['password']) {
@@ -53,7 +54,6 @@ export module Services {
 
     }
 
-    userInfoViaId
     async insertNode(key: any, userId: string, nbId: string, displayText) {
       try {
         if (key && key['akid'] && key['password']) {

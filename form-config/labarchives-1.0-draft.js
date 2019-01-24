@@ -34,7 +34,9 @@ module.exports = {
       definition: {
         name: 'Login',
         loginLabel: 'Login',
+        userLoginError:'Please include your UTS email address',
         usernameLabel: 'UTS email address',
+        userPasswordError: 'Please include your password token',
         passwordLabel: 'LabArchives password token for external applications',
         helpLoginLabel: 'To get your Lab Archives password token:',
         helpLoginLabelList: [

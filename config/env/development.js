@@ -31,7 +31,9 @@ module.exports = {
       appId: 'labarchives',
       recordType: 'labarchives',
       workspaceFileName: 'README.md',
-      key: {"akid": "USER", "password": "PASSWORD"}
+      key: {"akid": "USER", "password": "PASSWORD"},
+      location: 'https://au-mynotebook.labarchives.com',
+      description: 'LabArchives Workspace'
     }
   }
 };

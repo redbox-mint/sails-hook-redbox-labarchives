@@ -13,6 +13,8 @@ export class Config {
   types: any;
   workspaceFileName: string;
   key: any;
+  location: string;
+  description: string;
 
   constructor(workspaces) {
     const workspaceConfig = workspaces;
@@ -27,6 +29,8 @@ export class Config {
     this.parentRecord = workspaceConfig.parentRecord;
     this.provisionerUser = workspaceConfig.provisionerUser;
 
+    this.location = la.location;
+    this.description = la.description;
 
     this.brandingAndPortalUrl = '';
     this.redboxHeaders = {

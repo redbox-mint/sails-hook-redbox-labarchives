@@ -12,6 +12,8 @@ class Config {
         this.domain = la.domain;
         this.parentRecord = workspaceConfig.parentRecord;
         this.provisionerUser = workspaceConfig.provisionerUser;
+        this.location = la.location;
+        this.description = la.description;
         this.brandingAndPortalUrl = '';
         this.redboxHeaders = {
             'Cache-Control': 'no-cache',
