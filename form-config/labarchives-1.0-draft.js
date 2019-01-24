@@ -56,7 +56,8 @@ module.exports = {
       viewOnly: false,
       definition: {
         name: 'List',
-        linkedLabel: 'Linked with Stash'
+        linkedLabel: 'Linked with Stash',
+        defaultNotebookLabel: 'Default Notebook'
       }
     },
     {

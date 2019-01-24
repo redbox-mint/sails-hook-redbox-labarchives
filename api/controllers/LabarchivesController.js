@@ -32,7 +32,6 @@ var Controllers;
                     const userInfo = response['users'];
                     if (userInfo) {
                         info = new UserInfo_1.UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname'], userInfo['notebooks']);
-                        sails.log.debug(info);
                         return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
                     }
                     else {
@@ -47,8 +46,7 @@ var Controllers;
                         return WorkspaceService.createWorkspaceInfo(userId, this.config.appName, info);
                     }
                 }).subscribe(response => {
-                    const data = { status: true, login: true };
-                    this.ajaxOk(req, res, null, { status: true, labUser: info });
+                    this.ajaxOk(req, res, null, { status: true, login: true });
                 }, error => {
                     const errorMessage = `Failed to login for user ${user.username}`;
                     sails.log.error(error);

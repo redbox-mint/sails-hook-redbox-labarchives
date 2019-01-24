@@ -9,6 +9,7 @@ import {LabarchivesService} from "../labarchives.service";
 
 export class LabarchivesLoginField extends FieldBase<any> {
 
+  loading: boolean;
   valid = true;
   username: string;
   columns: object[];
@@ -34,6 +35,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
 
   constructor(options: any, injector: any) {
     super(options, injector);
+    this.loading = true;
     this.columns = options['columns'] || [];
     this.usernameLabel = options['usernameLabel'] || 'Username';
     this.passwordLabel = options['passwordLabel'] || 'Password';
@@ -52,6 +54,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
 
   checkLogin(status: boolean) {
     this.loggedIn = this.fieldMap._rootComp.loggedIn = status;
+    this.loading = false;
   }
 
   async login(form) {
@@ -94,7 +97,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
 @Component({
   selector: 'ws-labarchiveslogin',
   template: `
-    <div class="row">
+    <div class="row" *ngIf="!field.loading">
       <div *ngIf="!field.loggedIn" class="col-md-6">
         <form #form="ngForm">
           <div class="form-group">
@@ -123,7 +126,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
             <div class="alert alert-danger" *ngIf="field.errorMessage">{{ field.errorMessage }}</div>
           </div>
           <div>
-            <p></p>
+            <p>&nbsp;</p>
           </div>
         </form>
       </div>
@@ -139,6 +142,9 @@ export class LabarchivesLoginField extends FieldBase<any> {
           </div>
         </div>
       </div>
+    </div>
+    <div class="row">
+      <p>&nbsp;</p>
     </div>
     <div id="institutionModal" class="modal fade">
       <div class="modal-dialog" role="document">

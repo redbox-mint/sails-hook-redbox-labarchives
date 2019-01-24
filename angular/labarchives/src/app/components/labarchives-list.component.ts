@@ -22,6 +22,7 @@ export class LabarchivesListField extends FieldBase<any> {
   linkedAnotherLabel: string;
   linkLabel: string;
   linkProblem: string;
+  defaultNotebookLabel: string;
 
   @Input() user: any;
   @Output() link: EventEmitter<any> = new EventEmitter<any>();
@@ -42,43 +43,46 @@ export class LabarchivesListField extends FieldBase<any> {
     this.linkedAnotherLabel = options['linkedAnotherLabel'] || 'Linked to another workspace';
     this.linkLabel = options['linkLabel'] || 'Link Workspace';
     this.linkProblem = options['linkProblem'] || 'There was a problem checking the link';
+    this.defaultNotebookLabel = options['defaultNotebookLabel'] || 'Default Notebook';
   }
 
   registerEvents() {
-    this.fieldMap['Login'].field['userLogin'].subscribe(this.bindUser.bind(this));
-    //this.fieldMap['Link'].field['linkItem'].subscribe(this.listWorkspaces.bind(this));
+    this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
   }
 
   init() {
     this.rdmp = this.fieldMap._rootComp.rdmp;
   }
 
-  bindUser(labUser: any) {
-    console.log(labUser);
-    if (labUser && labUser.notebooks) {
-      this.labUser = labUser;
-      this.listWorkspaces();
-    }
-  }
 
   listWorkspaces() {
+    this.loading = true;
     this.labarchivesService.list().then(response => {
-      this.loggedIn = this.fieldMap._rootComp.loggedIn = true;
-      this.checkLoggedIn.emit(true);
-      this.workspaces = response.map((nb) => {
-        const isDefault = nb['isDefault'] ? 'default' : '';
-        return {
-          id: nb['id'],
-          name: nb['name'],
-          isDefault: isDefault ? 'Default Notebook' : '',
-          rdmp: {info: ''}
-        }
-      });
-      this.checkLinks();
+      if (response.status) {
+        const notebooks = response['notebooks']['notebook'];
+        this.loggedIn = this.fieldMap._rootComp.loggedIn = true;
+        this.checkLoggedIn.emit(true);
+        this.workspaces = notebooks.map((nb) => {
+          console.log(nb['is-default']['_']);
+          return {
+            id: nb['id'],
+            name: nb['name'],
+            isDefault: nb['is-default']['_']  == 'true' ? this.defaultNotebookLabel : '',
+            rdmp: {info: ''}
+          }
+        });
+        this.loading = false;
+        this.checkLinks();
+      } else {
+        this.checkLoggedIn.emit(false);
+        this.loading = false;
+        throw new Error('cannot list');
+      }
     }).catch(error => {
+      this.loading = false;
       this.workspaces = null;
       this.checkLoggedIn.emit(false);
-    })
+    });
   }
 
   linkWorkspace(item: any) {
@@ -94,7 +98,6 @@ export class LabarchivesListField extends FieldBase<any> {
             throw new Error('Error checking workspace');
           } else {
             const check = response['check'];
-            console.log(check);
             if (check['link'] === 'linked') {
               this.workspaces[index]['linkedState'] = 'linked';
             } else {
@@ -103,7 +106,6 @@ export class LabarchivesListField extends FieldBase<any> {
           }
         })
         .catch((error) => {
-          console.log(error);
           this.workspaces[index]['linkedState'] = 'problem';
         });
     });
