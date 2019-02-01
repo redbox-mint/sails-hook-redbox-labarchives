@@ -27,6 +27,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
   submitted = false;
   errorMessage: string = undefined;
   closeLabel: string;
+  location: string;
 
   user: any;
   loggedIn: boolean;
@@ -67,6 +68,8 @@ export class LabarchivesLoginField extends FieldBase<any> {
     const userInfo = await this.labarchivesService.getUserInfo();
     const user = userInfo['user'];
     this.userEmail = user['email'];
+    const info = await this.labarchivesService.info();
+    this.location = info['location'];
   }
 
   async login(form) {
@@ -144,6 +147,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
       <div *ngIf="!field.loggedIn" class="col-md-6">
         <div class="form-row">
           <p>{{ field.helpLoginLabel }}</p>
+          <p><a href="{{ field.location }}" target="_blank" rel="noopener noreferrer">{{ field.location }}</a></p>
           <ul>
             <li *ngFor="let help of field.helpLoginLabelList">{{ help }}</li>
           </ul>

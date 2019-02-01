@@ -11,12 +11,17 @@ var Controllers;
         constructor() {
             super();
             this._exportedMethods = [
+                'info',
                 'login',
                 'link',
                 'checkLink',
                 'list'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
+        }
+        info(req, res) {
+            this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+            this.ajaxOk(req, res, null, { location: this.config.location, status: true });
         }
         login(req, res) {
             const user = {

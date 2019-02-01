@@ -22,6 +22,7 @@ export module Controllers {
   export class LabarchivesController extends controller.Controllers.Core.Controller {
 
     protected _exportedMethods: any = [
+      'info',
       'login',
       'link',
       'checkLink',
@@ -34,6 +35,11 @@ export module Controllers {
     constructor() {
       super();
       this.config = new Config(sails.config.workspaces);
+    }
+
+    public info(req, res) {
+      this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+      this.ajaxOk(req, res, null, {location: this.config.location, status: true});
     }
 
     login(req, res) {

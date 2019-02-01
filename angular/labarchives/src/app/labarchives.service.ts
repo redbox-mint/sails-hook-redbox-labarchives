@@ -34,6 +34,19 @@ export class LabarchivesService extends BaseService {
     }
   }
 
+  public async info() {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/info';
+    try {
+      const result = await this.http.get(
+        wsUrl,
+        this.options
+      ).toPromise();
+      return Promise.resolve(this.extractData(result));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
   public async login(username, password) {
     const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/login';
     try {
