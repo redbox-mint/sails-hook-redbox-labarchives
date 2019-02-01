@@ -67,7 +67,7 @@ export class LabarchivesListField extends FieldBase<any> {
           return {
             id: nb['id'],
             name: nb['name'],
-            isDefault: nb['is-default']['_']  == 'true' ? this.defaultNotebookLabel : '',
+            isDefault: nb['is-default']['_'] == 'true' ? this.defaultNotebookLabel : '',
             rdmp: {info: ''}
           }
         });
@@ -90,25 +90,26 @@ export class LabarchivesListField extends FieldBase<any> {
   }
 
   checkLinks() {
-    //this.workspaces[index]['linkedState'] == 'check'; // Possible values: linked, another, link
-    this.workspaces.map((w, index) => {
-      this.labarchivesService.checkLink(this.rdmp, w['id'])
-        .then((response) => {
-          if (!response.status) {
-            throw new Error('Error checking workspace');
-          } else {
-            const check = response['check'];
-            if (check['link'] === 'linked') {
-              this.workspaces[index]['linkedState'] = 'linked';
+    this.workspaces.reduce((promise, w, index) => {
+      return promise.then(() => {
+        return this.labarchivesService.checkLink(this.rdmp, w['id'])
+          .then((response) => {
+            if (!response.status) {
+              throw new Error('Error checking workspace');
             } else {
-              this.workspaces[index]['linkedState'] = 'link';
+              const check = response['check'];
+              if (check['link'] === 'linked') {
+                this.workspaces[index]['linkedState'] = 'linked';
+              } else {
+                this.workspaces[index]['linkedState'] = 'link';
+              }
             }
-          }
-        })
-        .catch((error) => {
-          this.workspaces[index]['linkedState'] = 'problem';
-        });
-    });
+          })
+          .catch((error) => {
+            this.workspaces[index]['linkedState'] = 'problem';
+          });
+      });
+    }, Promise.resolve());
   }
 
 }
