@@ -38,7 +38,7 @@ module.exports = {
         usernameLabel: 'UTS email address',
         userPasswordError: 'Please include your password token',
         passwordLabel: 'LabArchives password token for external applications',
-        helpLoginLabel: 'To get your Lab Archives password token:',
+        helpLoginLabel: 'To get your LabArchives password token:',
         helpLoginLabelList: [
           'Log in to LabArchives',
           'In the top right, choose the user menu',

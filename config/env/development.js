@@ -33,7 +33,7 @@ module.exports = {
       workspaceFileName: 'README.md',
       key: {"akid": "USER", "password": "PASSWORD"},
       location: 'https://au-mynotebook.labarchives.com',
-      description: 'LabArchives Workspace'
+      description: 'eNotebook Workspace'
     }
   }
 };
