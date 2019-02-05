@@ -24,7 +24,7 @@ module.exports = {
       viewOnly: false,
       definition: {
         name: 'title',
-        value: 'LabArchives',
+        value: 'eNotebooks',
         type: 'h2'
       }
     },
