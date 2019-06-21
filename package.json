@@ -25,20 +25,20 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "@types/node": "^10.12.18",
-    "@types/lodash": "^4.14.118",
-    "mocha": "^5.1.1",
+    "@types/lodash": "^4.14.134",
+    "mocha": "^6.1.4",
     "sails": "^1.0.2",
-    "supertest": "^3.0.0",
+    "supertest": "^4.0.2",
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@uts-eresearch/provision-labarchives": "1.0.1",
+    "@uts-eresearch/provision-labarchives": "1.0.2",
     "lodash": "^4.17.11",
     "ncp": "^2.0.0",
-    "path-exists": "^3.0.0",
+    "path-exists": "^4.0.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2",
-    "rxjs": "^6.3.3",
-    "rxjs-compat": "^6.3.3"
+    "request-promise": "^4.2.4",
+    "rxjs": "6.5.2",
+    "rxjs-compat": "6.5.2"
   }
 }
