@@ -75,8 +75,7 @@ export module Controllers {
           sails.log.error(error);
           this.ajaxFail(req, res, errorMessage, {status: false, message: errorMessage});
         });
-      }
-      else {
+      } else {
         const message = 'Input username and password';
         this.ajaxFail(req, res, message, {status: false, message: message});
       }
@@ -89,7 +88,12 @@ export module Controllers {
       let info = {};
       return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
         .flatMap(response => {
-          const user = response['info'] || null;
+          let user = null;
+          if (!response) {
+            user = null;
+          } else {
+            user = response['info'] || null;
+          }
           if (user) {
             const userInfo = LabarchivesService.userInfo(this.config.key, user['id'], true);
             return Observable.fromPromise(userInfo);
