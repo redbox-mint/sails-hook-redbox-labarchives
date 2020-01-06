@@ -76,7 +76,8 @@ export class LabarchivesLoginField extends FieldBase<any> {
     const formValid = this.loginValid(form);
     if (formValid === '') {
       // TODO: Investigate this. Using this method to remove the trailing Base64 equals ==
-      form.password = form.password.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+      form.password = form.password.trim();
+      form.password = form.password.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       this.user = {username: this.userEmail, password: form.password};
       const login = await this.labarchivesService.login(this.user.username, this.user.password);
       if (login.status) {

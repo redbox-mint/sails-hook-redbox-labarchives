@@ -32,8 +32,8 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@uts-eresearch/provision-labarchives": "1.0.3",
-    "lodash": "^4.17.11",
+    "@uts-eresearch/provision-labarchives": "1.0.4",
+    "lodash": "4.14.116",
     "ncp": "^2.0.0",
     "path-exists": "^4.0.0",
     "request": "^2.88.0",

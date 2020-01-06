@@ -17,7 +17,8 @@
     ]
   },
   "types": [
-    "jquery"
+    "jquery",
+    "jasmine"
   ],
   "include": [
     "src/**/*",
@@ -26,7 +27,9 @@
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "node_modules/ng2-datetime/**/*.spec.ts",
+    "node_modules/ng2-datetime/src/ng2-datetime/*.spec.ts"
   ],
   "allowSyntheticDefaultImports": true
 }
