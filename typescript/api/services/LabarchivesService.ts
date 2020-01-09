@@ -20,7 +20,10 @@ export module Services {
       'insertNode',
       'addEntry',
       'getNotebookInfo',
-      'getNotebookTree'
+      'getNotebookTree',
+      'createNotebook',
+      'addUserToNotebook',
+      'userHasEmail'
     ];
 
     constructor() {
@@ -40,7 +43,7 @@ export module Services {
       }
 
     }
-    
+
     async userInfo(key: any, userId: string) {
       try {
         if (key && key['akid'] && key['password']) {
@@ -104,6 +107,43 @@ export module Services {
         return Promise.reject(new Error(e));
       }
     }
+
+    async createNotebook(key: any, userId: string, name: string) {
+      try {
+        if (key && key['akid'] && key['password']) {
+          return await la.createNotebook(key, userId, name);
+        } else {
+          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
+    }
+
+    async addUserToNotebook(key, uid, nbid, email, userRole) {
+      try {
+        if (key && key['akid'] && key['password']) {
+          return await la.addUserToNotebook(key, uid, nbid, email, userRole);
+        } else {
+          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
+    }
+
+    async userHasEmail(key: any, email: string) {
+      try {
+        if (key && key['akid'] && key['password']) {
+          return await la.emailHasAccount(key, email);
+        } else {
+          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
+    }
+
   }
 }
 module.exports = new Services.LabarchivesService().exports();

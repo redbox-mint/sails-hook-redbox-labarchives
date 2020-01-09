@@ -34,7 +34,7 @@ module.exports = {
       definition: {
         name: 'Login',
         loginLabel: 'Login',
-        userLoginError:'Please include your UTS email address',
+        userLoginError: 'Please include your UTS email address',
         usernameLabel: 'UTS email address',
         userPasswordError: 'Please include your password token',
         passwordLabel: 'LabArchives password token for external applications',
@@ -59,7 +59,8 @@ module.exports = {
       definition: {
         name: 'List',
         linkedLabel: 'Linked with Stash',
-        defaultNotebookLabel: 'Default Notebook'
+        defaultNotebookLabel: 'Default Notebook',
+        createNotebookLabel: 'Create Notebook'
       }
     },
     {
@@ -67,6 +68,27 @@ module.exports = {
       viewOnly: false,
       definition: {
         name: 'Link',
+        processingLabel: 'Processing...',
+        processingSuccess: 'Your workspace was linked successfully',
+        processingFail: 'There was a problem linking your workspace, please try again later',
+        processingNoPermission: 'You do not have rights to modify this item',
+        closeLabel: 'Close',
+      }
+    },
+    {
+      class: 'LabarchivesCreateField',
+      viewOnly: false,
+      definition: {
+        name: 'Create',
+        createButton: 'Create Notebook',
+        supervisorFailMessage: 'Supervisor has not logged in to LabArchives',
+        createNotebookHelp: 'Creating a notebook with Stash will add your supervisor as an owner. It will also then add information about your Data Management Plan on it',
+        createNotebookHelp2: 'Give your notebook a name that is related to your research',
+        notebookLabel: 'Notebook Name',
+        supervisorLabel: 'Supervisor',
+        createNotebookLabel: 'Create Notebook',
+        creatingLabel: 'Creating Notebook',
+        linkingLabel: 'Linking Notebook',
         processingLabel: 'Processing...',
         processingSuccess: 'Your workspace was linked successfully',
         processingFail: 'There was a problem linking your workspace, please try again later',

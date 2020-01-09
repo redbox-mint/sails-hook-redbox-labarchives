@@ -22,7 +22,10 @@ var Services;
                 'insertNode',
                 'addEntry',
                 'getNotebookInfo',
-                'getNotebookTree'
+                'getNotebookTree',
+                'createNotebook',
+                'addUserToNotebook',
+                'userHasEmail'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
         }
@@ -106,6 +109,51 @@ var Services;
                 try {
                     if (key && key['akid'] && key['password']) {
                         return yield la.getTree(key, userId, nbId, treeLevel);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        createNotebook(key, userId, name) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.createNotebook(key, userId, name);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        addUserToNotebook(key, uid, nbid, email, userRole) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.addUserToNotebook(key, uid, nbid, email, userRole);
+                    }
+                    else {
+                        return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+                    }
+                }
+                catch (e) {
+                    return Promise.reject(new Error(e));
+                }
+            });
+        }
+        userHasEmail(key, email) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (key && key['akid'] && key['password']) {
+                        return yield la.emailHasAccount(key, email);
                     }
                     else {
                         return Promise.reject(new Error('missing keys for accessing lab archives APIs'));

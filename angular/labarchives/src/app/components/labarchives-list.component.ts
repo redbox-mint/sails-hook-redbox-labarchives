@@ -23,10 +23,12 @@ export class LabarchivesListField extends FieldBase<any> {
   linkLabel: string;
   linkProblem: string;
   defaultNotebookLabel: string;
+  createNotebookLabel: string;
 
   @Input() user: any;
   @Output() link: EventEmitter<any> = new EventEmitter<any>();
   @Output() checkLoggedIn: EventEmitter<any> = new EventEmitter<any>();
+  @Output() create: EventEmitter<any> = new EventEmitter<any>();
 
   labarchivesService: LabarchivesService;
 
@@ -44,6 +46,7 @@ export class LabarchivesListField extends FieldBase<any> {
     this.linkLabel = options['linkLabel'] || 'Link Workspace';
     this.linkProblem = options['linkProblem'] || 'There was a problem checking the link';
     this.defaultNotebookLabel = options['defaultNotebookLabel'] || 'Default Notebook';
+    this.createNotebookLabel = options['createNotebookLabel'] || 'Create Notebook';
   }
 
   registerEvents() {
@@ -87,6 +90,10 @@ export class LabarchivesListField extends FieldBase<any> {
 
   linkWorkspace(item: any) {
     this.link.emit(item);
+  }
+
+  createWorkspace() {
+    this.create.emit();
   }
 
   checkLinks() {
@@ -178,6 +185,10 @@ export class LabarchivesListField extends FieldBase<any> {
               you do not have access to</p>
           </div>
         </div>
+        <div>
+          <button class="btn btn-primary" type="button" (click)="field.createWorkspace()">{{field.createNotebookLabel}}</button>
+        </div>
+        <div class="row">&nbsp;</div>
       </div>
     </div>
   `

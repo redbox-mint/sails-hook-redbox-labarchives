@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
 require("rxjs/add/operator/map");
@@ -12,16 +20,35 @@ var Controllers;
             super();
             this._exportedMethods = [
                 'info',
+                'rdmpInfo',
                 'login',
                 'link',
                 'checkLink',
-                'list'
+                'list',
+                'createNotebook'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
         }
         info(req, res) {
             this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
             this.ajaxOk(req, res, null, { location: this.config.location, status: true });
+        }
+        rdmpInfo(req, res) {
+            sails.log.debug('rdmpInfo');
+            const userId = req.user.id;
+            const rdmp = req.param('rdmp');
+            let recordMetadata = {};
+            this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+            return WorkspaceService.getRecordMeta(this.config, rdmp)
+                .subscribe(response => {
+                sails.log.debug('recordMetadata');
+                recordMetadata = response;
+                this.ajaxOk(req, res, null, { status: true, recordMetadata: recordMetadata });
+            }, error => {
+                sails.log.error('recordMetadata: error');
+                sails.log.error(error);
+                this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+            });
         }
         login(req, res) {
             const user = {
@@ -148,11 +175,11 @@ var Controllers;
                     const tree = response['tree-tools'];
                     const node = tree['node'];
                     metadataContent = `
-          <div id="${workspace.oid}">      
-            <h1>UTS</h1>             
-            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>                       
-            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>            
-            <p>Stash Id: ${workspace.oid}</p>   
+          <div id="${workspace.oid}">
+            <h1>UTS</h1>
+            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>
+            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>
+            <p>Stash Id: ${workspace.oid}</p>
           </div>
           `;
                     const partType = 'text entry';
@@ -211,6 +238,74 @@ var Controllers;
                 this.ajaxOk(req, res, null, { status: true, check: check, message: 'checkLink' });
             }, error => {
                 sails.log.error('checkLink: error');
+                sails.log.error(error);
+                this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+            });
+        }
+        createNotebook(req, res) {
+            const userId = req.user.id;
+            const name = req.param('name');
+            const userEmail = req.param('userEmail');
+            let supervisor = req.param('supervisor');
+            const rdmp = req.param('rdmp');
+            let recordMetadata = {};
+            let rdmpTitle = '';
+            let info = {};
+            let nb;
+            this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+            return WorkspaceService.getRecordMeta(this.config, rdmp)
+                .flatMap(response => {
+                sails.log.debug('recordMetadata');
+                recordMetadata = response;
+                rdmpTitle = recordMetadata['title'];
+                const supervisorFromRDMP = recordMetadata['contributor_ci']['email'];
+                if (supervisor === supervisorFromRDMP) {
+                    return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
+                }
+                else {
+                    rxjs_1.Observable.throwError(new Error('Supervisor email does not match workspace'));
+                }
+                sails.log.debug(recordMetadata);
+            })
+                .flatMap((response) => __awaiter(this, void 0, void 0, function* () {
+                sails.log.debug('workspaceAppFromUserId');
+                info = response.info;
+                sails.log.debug('userHasEmail');
+                const supervisorHasEmail = yield LabarchivesService.userHasEmail(this.config.key, supervisor);
+                if (supervisorHasEmail && supervisorHasEmail['users'] && supervisorHasEmail['users']['account-for-email']['_']) {
+                    sails.log.debug('createNotebook');
+                    const result = yield LabarchivesService.createNotebook(this.config.key, info['id'], name);
+                    if (result && result.notebooks) {
+                        nb = result.notebooks;
+                        if (userEmail.toLowerCase() === supervisor.toLowerCase()) {
+                            return rxjs_1.Observable.of(nb);
+                        }
+                        else {
+                            const addUser = yield LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'OWNER');
+                            sails.log.debug('addUser');
+                            if (addUser) {
+                                const nbu = addUser.notebooks['notebook-user'];
+                                sails.log.debug(nbu);
+                                return rxjs_1.Observable.of(nb);
+                            }
+                            else {
+                                rxjs_1.Observable.throwError(new Error('Cannot add user to notebook'));
+                            }
+                        }
+                    }
+                    else {
+                        rxjs_1.Observable.throwError(new Error('Notebook not created'));
+                    }
+                }
+                else {
+                    rxjs_1.Observable.throwError(new Error('Supervisor not on LabArchives'));
+                }
+            }))
+                .subscribe(response => {
+                sails.log.debug('create notebook');
+                this.ajaxOk(req, res, null, { status: true, nb: nb['nbid'], name: name, message: 'createNotebook' });
+            }, error => {
+                sails.log.error('createNotebook: error');
                 sails.log.error(error);
                 this.ajaxFail(req, res, error.message, { status: false, message: error.message });
             });

@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "NODE_ENV=test node_modules/.bin/mocha",
-    "compile": "node_modules/.bin/tsc --project tsconfig.json"
+    "compile": "node_modules/.bin/tsc --project tsconfig.json",
+    "watch": "node_modules/.bin/tsc --watch typescript/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -32,8 +33,8 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@uts-eresearch/provision-labarchives": "1.0.4",
-    "lodash": "4.14.116",
+    "@uts-eresearch/provision-labarchives": "1.1.2",
+    "lodash": "^4.17.15",
     "ncp": "^2.0.0",
     "path-exists": "^4.0.0",
     "request": "^2.88.0",

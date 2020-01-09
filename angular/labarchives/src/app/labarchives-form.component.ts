@@ -11,6 +11,7 @@ import {TranslationService} from './shared/translation-service';
 import {LabarchivesLoginComponent, LabarchivesLoginField} from './components/labarchives-login.component';
 import {LabarchivesListComponent, LabarchivesListField} from './components/labarchives-list.component';
 import {LabarchivesLinkField, LabarchivesLinkComponent} from './components/labarchives-link.component';
+import {LabarchivesCreateField, LabarchivesCreateComponent} from './components/labarchives-create.component';
 
 import * as jQuery from 'jquery';
 
@@ -135,7 +136,8 @@ export class LabarchivesFormComponent extends LoadableComponent {
     this.fcs.addComponentClasses({
       'LabarchivesLoginField': {'meta': LabarchivesLoginField, 'comp': LabarchivesLoginComponent},
       'LabarchivesListField': {'meta': LabarchivesListField, 'comp': LabarchivesListComponent},
-      'LabarchivesLinkField': {'meta': LabarchivesLinkField, 'comp': LabarchivesLinkComponent}
+      'LabarchivesLinkField': {'meta': LabarchivesLinkField, 'comp': LabarchivesLinkComponent},
+      'LabarchivesCreateField': {'meta': LabarchivesCreateField, 'comp': LabarchivesCreateComponent}
     });
 
     this.RecordsService.getForm(this.oid, this.recordType, this.editMode).then((obs: any) => {

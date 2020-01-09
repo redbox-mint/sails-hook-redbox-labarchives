@@ -60,6 +60,7 @@ export class LabarchivesLinkField extends FieldBase<any> {
 
   registerEvents() {
     this.fieldMap['List'].field['link'].subscribe(this.linkItem.bind(this));
+    this.fieldMap['Create'].field['link'].subscribe(this.linkItem.bind(this));
   }
 
   createFormModel(valueElem: any = undefined): any {

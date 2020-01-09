@@ -115,4 +115,32 @@ export class LabarchivesService extends BaseService {
     }
   }
 
+  public async createNotebook(rdmp: string, nbName: string, supervisorEmail: string, userEmail: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/create';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {name: nbName, supervisor: supervisorEmail, rdmp: rdmp, userEmail: userEmail},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
+  public async rdmpInfo(rdmp: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/rdmp';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {rdmp: rdmp},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
 }
