@@ -34,6 +34,7 @@ export class LabarchivesLinkField extends FieldBase<any> {
   rdmp: string;
 
   @Input() LinkItem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() list: EventEmitter<any> = new EventEmitter<any>();
 
   labarchivesService: LabarchivesService;
 
@@ -100,6 +101,7 @@ export class LabarchivesLinkField extends FieldBase<any> {
         this.checks.linkCreated = true;
         this.checks.master = true;
         this.processingFail = undefined;
+        this.list.emit();
       } else if(link.message === 'cannot insert node'){
         this.processingFail = this.processingNoPermission;
         this.checks.linkWithOther = true

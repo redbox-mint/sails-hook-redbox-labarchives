@@ -51,6 +51,7 @@ export class LabarchivesListField extends FieldBase<any> {
 
   registerEvents() {
     this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
+    this.fieldMap['Link'].field['list'].subscribe(this.listWorkspaces.bind(this));
   }
 
   init() {
