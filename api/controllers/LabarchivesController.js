@@ -113,7 +113,16 @@ var Controllers;
                 }
             })
                 .subscribe(response => {
-                const notebooks = response['users']['notebooks'];
+                let resNotebooks = response['users']['notebooks'];
+                let notebooks = { '$': { type: 'array' }, notebook: [] };
+                if (Array.isArray(resNotebooks['notebook'])) {
+                    notebooks['notebook'] = resNotebooks['notebook'];
+                }
+                else {
+                    if (resNotebooks['notebook']) {
+                        notebooks['notebook'] = [resNotebooks['notebook']];
+                    }
+                }
                 this.ajaxOk(req, res, null, { status: true, notebooks: notebooks, message: 'list' });
             }, error => {
                 sails.log.error('list: error');
