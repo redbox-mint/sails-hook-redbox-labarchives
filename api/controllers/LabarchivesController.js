@@ -86,7 +86,16 @@ var Controllers;
                 }
             })
                 .subscribe(response => {
-                const notebooks = response['users']['notebooks'];
+                let resNotebooks = response['users']['notebooks'];
+                let notebooks = { '$': { type: 'array' }, notebook: [] };
+                if (Array.isArray(resNotebooks['notebook'])) {
+                    notebooks['notebook'] = resNotebooks['notebook'];
+                }
+                else {
+                    if (resNotebooks['notebook']) {
+                        notebooks['notebook'] = [resNotebooks['notebook']];
+                    }
+                }
                 this.ajaxOk(req, res, null, { status: true, notebooks: notebooks, message: 'list' });
             }, error => {
                 sails.log.error('list: error');
@@ -148,11 +157,11 @@ var Controllers;
                     const tree = response['tree-tools'];
                     const node = tree['node'];
                     metadataContent = `
-          <div id="${workspace.oid}">      
-            <h1>UTS</h1>             
-            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>                       
-            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>            
-            <p>Stash Id: ${workspace.oid}</p>   
+          <div id="${workspace.oid}">
+            <h1>UTS</h1>
+            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>
+            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>
+            <p>Stash Id: ${workspace.oid}</p>
           </div>
           `;
                     const partType = 'text entry';
