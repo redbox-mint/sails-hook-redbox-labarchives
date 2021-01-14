@@ -290,7 +290,7 @@ var Controllers;
                             return rxjs_1.Observable.of(nb);
                         }
                         else {
-                            const addUser = yield LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'OWNER');
+                            const addUser = yield LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'ADMINISTRATOR');
                             sails.log.debug('addUser');
                             if (addUser) {
                                 const nbu = addUser.notebooks['notebook-user'];

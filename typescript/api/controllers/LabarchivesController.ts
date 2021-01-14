@@ -305,7 +305,7 @@ export module Controllers {
               if (userEmail.toLowerCase() === supervisor.toLowerCase()) {
                 return Observable.of(nb);
               } else {
-                const addUser = await LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'OWNER');
+                const addUser = await LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'ADMINISTRATOR');
                 sails.log.debug('addUser');
                 if (addUser) {
                   const nbu = addUser.notebooks['notebook-user'];
