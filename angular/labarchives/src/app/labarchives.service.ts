@@ -143,4 +143,18 @@ export class LabarchivesService extends BaseService {
     }
   }
 
+  public async checkExport(workspace: any, rdmpId: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/export';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {rdmp: rdmp},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
 }

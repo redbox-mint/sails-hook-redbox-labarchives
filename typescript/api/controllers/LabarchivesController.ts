@@ -11,6 +11,7 @@ declare var BrandingService, WorkspaceService, LabarchivesService;
  */
 import controller = require('../core/CoreController');
 import {Config} from '../Config';
+import {ExportConfig} from '../ExportConfig';
 import {UserInfo} from "../UserInfo";
 
 export module Controllers {
@@ -28,15 +29,19 @@ export module Controllers {
       'link',
       'checkLink',
       'list',
-      'createNotebook'
+      'createNotebook',
+      'export'
     ];
     _config: any;
 
     protected config: Config;
+    protected exportConfig: ExportConfig;
 
     constructor() {
       super();
       this.config = new Config(sails.config.workspaces);
+      const eC = sails.config.workspaces.exportConfig;
+      this.exportConfig = new ExportConfig(eC.host, eC.url, eC.authorization);
     }
 
     public info(req, res) {
@@ -123,11 +128,11 @@ export module Controllers {
         })
         .subscribe(response => {
           let resNotebooks = response['users']['notebooks'];
-          let notebooks = {'$': { type: 'array' }, notebook: []};
-          if(Array.isArray(resNotebooks['notebook'])) {
+          let notebooks = {'$': {type: 'array'}, notebook: []};
+          if (Array.isArray(resNotebooks['notebook'])) {
             notebooks['notebook'] = resNotebooks['notebook'];
           } else {
-            if(resNotebooks['notebook']){
+            if (resNotebooks['notebook']) {
               notebooks['notebook'] = [resNotebooks['notebook']];
             }
           }
@@ -331,6 +336,30 @@ export module Controllers {
           this.ajaxFail(req, res, error.message, {status: false, message: error.message});
         });
     }
+
+    export(req, res): any {
+      try {
+        const userId = req.user.id;
+        const username = req.user.username;
+        this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+        const rdmp = req.param('rdmp');
+        const notebook = req.param('workspace');
+        sails.log.debug('create notebook');
+        const workspaceInfo = await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
+        const exportNotebook = await LabarchivesService.exportNotebook(this.exportConfig, workspaceInfo['id'], notebook.id);
+        let exportedId;
+        if (!exportNotebook.error) {
+          exportedId = exportNotebook.notebookId;
+          this.ajaxOk(req, res, null, {status: true, nb: exportedId, message: 'exportNotebook'});
+        } else {
+          this.ajaxFail(req, res, exportNotebook.error, {status: false, message: exportNotebook.error});
+        }
+      } catch (error) {
+        sails.log.error('createNotebook: error');
+        sails.log.error(error);
+        this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+      }
+    }
   }
-}
-module.exports = new Controllers.LabarchivesController().exports();
+
+  module.exports = new Controllers.LabarchivesController().exports();

@@ -1,8 +1,9 @@
 import {Sails, Model} from 'sails';
-
+import got from 'got';
 import * as la from '@uts-eresearch/provision-labarchives';
 
 import {Config} from '../Config';
+import {ExportConfig} from '../ExportConfig';
 
 import services = require('../core/CoreService');
 
@@ -138,6 +139,25 @@ export module Services {
           return await la.emailHasAccount(key, email);
         } else {
           return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+        }
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
+    }
+
+    async exportNotebook(exportConfig: ExportConfig, uid: string, nbid: string) {
+      try {
+        const {body} = await got.post(exportConfig.url, {
+          json: {
+            uid: uid, nbid: nbid
+          },
+          responseType: 'json',
+          headers: exportConfig.headers
+        });
+        if (body.data) {
+          return body.data;
+        } else {
+          return {error: true, body.error}
         }
       } catch (e) {
         return Promise.reject(new Error(e));

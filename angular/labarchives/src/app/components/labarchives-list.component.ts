@@ -24,6 +24,7 @@ export class LabarchivesListField extends FieldBase<any> {
   linkProblem: string;
   defaultNotebookLabel: string;
   createNotebookLabel: string;
+  exportStatus: string;
 
   @Input() user: any;
   @Output() link: EventEmitter<any> = new EventEmitter<any>();
@@ -120,6 +121,17 @@ export class LabarchivesListField extends FieldBase<any> {
     }, Promise.resolve());
   }
 
+  checkExport(item) {
+    this.labarchivesService.checkExport(item, this.rdmp)
+      .then((response) => {
+        console.log(response);
+        this.exportStatus = 'working';
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
 }
 
 
@@ -171,6 +183,10 @@ export class LabarchivesListField extends FieldBase<any> {
                   <button type="button" disabled class="btn btn-warning btn-block"
                           [name]="item['@id']">{{ field.linkProblem }}</button>
                 </span>
+              </td>
+              <td>
+                <button class="btn btn-secondary" type="button" (click)="field.checkExport(item)" [name]="item['@id']">
+                  {{field.exportStatus}}</button>
               </td>
             </tr>
             </tbody>
