@@ -12,13 +12,14 @@ class Config {
         this.domain = la.domain;
         this.parentRecord = workspaceConfig.parentRecord;
         this.provisionerUser = workspaceConfig.provisionerUser;
+        this.authorization = workspaceConfig.portal.authorization;
         this.location = la.location;
         this.description = la.description;
         this.brandingAndPortalUrl = '';
         this.redboxHeaders = {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json',
-            'Authorization': workspaceConfig.portal.authorization,
+            'Authorization': this.authorization
         };
         this.defaultGroupId = la.defaultGroupId;
         this.types = la.types;

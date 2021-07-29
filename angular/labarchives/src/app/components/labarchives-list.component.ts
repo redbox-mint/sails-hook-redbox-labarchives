@@ -15,8 +15,10 @@ export class LabarchivesListField extends FieldBase<any> {
   rdmpLinkLabel: string;
 
   loading: boolean;
+  loadingChecks: boolean;
   labUser: any = {};
   rdmp: string;
+  rdmpTitle: string;
   workspaces: any;
   linkedLabel: string;
   linkedAnotherLabel: string;
@@ -30,6 +32,7 @@ export class LabarchivesListField extends FieldBase<any> {
   @Output() link: EventEmitter<any> = new EventEmitter<any>();
   @Output() checkLoggedIn: EventEmitter<any> = new EventEmitter<any>();
   @Output() create: EventEmitter<any> = new EventEmitter<any>();
+  @Output() goToExporter: EventEmitter<any> = new EventEmitter<any>();
 
   labarchivesService: LabarchivesService;
 
@@ -53,6 +56,7 @@ export class LabarchivesListField extends FieldBase<any> {
   registerEvents() {
     this.fieldMap['Login'].field['userLogin'].subscribe(this.listWorkspaces.bind(this));
     this.fieldMap['Link'].field['list'].subscribe(this.listWorkspaces.bind(this));
+    this.fieldMap['Export'].field['list'].subscribe(this.listWorkspaces.bind(this));
   }
 
   init() {
@@ -62,7 +66,11 @@ export class LabarchivesListField extends FieldBase<any> {
 
   listWorkspaces() {
     this.loading = true;
-    this.labarchivesService.list().then(response => {
+    this.labarchivesService.rdmpInfo(this.rdmp).then(response => {
+      this.fieldMap._rootComp.rdmpMetadata = response['recordMetadata'];
+      this.rdmpTitle = this.fieldMap._rootComp.rdmpMetadata['title']
+      return this.labarchivesService.list();
+    }).then(response => {
       if (response.status) {
         const notebooks = response['notebooks']['notebook'];
         this.loggedIn = this.fieldMap._rootComp.loggedIn = true;
@@ -99,7 +107,8 @@ export class LabarchivesListField extends FieldBase<any> {
   }
 
   checkLinks() {
-    this.workspaces.reduce((promise, w, index) => {
+    this.loadingChecks = true;
+    const links = this.workspaces.reduce((promise, w, index) => {
       return promise.then(() => {
         return this.labarchivesService.checkLink(this.rdmp, w['id'])
           .then((response) => {
@@ -119,17 +128,19 @@ export class LabarchivesListField extends FieldBase<any> {
           });
       });
     }, Promise.resolve());
+    links.then(e => {
+      console.log(e);
+      this.loadingChecks = false;
+    });
   }
 
-  checkExport(item) {
-    this.labarchivesService.checkExport(item, this.rdmp)
-      .then((response) => {
-        console.log(response);
-        this.exportStatus = 'working';
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  exporter(item) {
+    this.workspaces = null;
+    this.goToExporter.emit(item);
+  }
+
+  logOut() {
+    alert('not implemented');
   }
 
 }
@@ -138,6 +149,9 @@ export class LabarchivesListField extends FieldBase<any> {
 @Component({
   selector: 'ws-labarchiveslist',
   template: `
+    <div class="row">
+      <h4>Current Data Plan Selected: {{ field.rdmpTitle }}</h4>
+    </div>
     <div class="row">
       <div *ngIf="field.workspaces" class="col-lg-12">
         <div class="">
@@ -185,8 +199,9 @@ export class LabarchivesListField extends FieldBase<any> {
                 </span>
               </td>
               <td>
-                <button class="btn btn-secondary" type="button" (click)="field.checkExport(item)" [name]="item['@id']">
-                  {{field.exportStatus}}</button>
+                <button class="btn btn-primary btn-block" [disabled]="field.loadingChecks ? 'disabled': null"
+                        (click)="field.exporter(item)">Export
+                </button>
               </td>
             </tr>
             </tbody>
@@ -202,23 +217,31 @@ export class LabarchivesListField extends FieldBase<any> {
               you do not have access to</p>
           </div>
         </div>
-        <div>
-          <button class="btn btn-primary" type="button" (click)="field.createWorkspace()">{{field.createNotebookLabel}}</button>
+        <div class="row">
+          <button class="btn btn-primary" type="button"
+                  (click)="field.createWorkspace()">{{field.createNotebookLabel}}</button>
         </div>
+        <p>&nbsp;</p>
+<!--        <div class="row">-->
+<!--          <button class="btn btn-secondary" type="button"-->
+<!--                  (click)="field.logOut()">Revoke Login Consent-->
+<!--          </button>-->
+<!--        </div>-->
         <div class="row">&nbsp;</div>
       </div>
     </div>
   `
 })
-export class LabarchivesListComponent extends SimpleComponent {
+export class LabarchivesListComponent extends SimpleComponent implements OnInit {
   field: LabarchivesListField;
 
   ngOnInit() {
     this.field.registerEvents();
+    //this.field.init();
   }
 
   ngAfterContentInit() {
-    this.field.listWorkspaces();
+    this.field.init();
   }
 
 }

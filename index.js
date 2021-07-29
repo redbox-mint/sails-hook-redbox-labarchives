@@ -63,7 +63,11 @@ module.exports = function (sails) {
         'post /:branding/:portal/ws/labarchives/checkLink': LabarchivesController.checkLink,
         'post /:branding/:portal/ws/labarchives/create': LabarchivesController.createNotebook,
         'post /:branding/:portal/ws/labarchives/rdmp': LabarchivesController.rdmpInfo,
-        'post /:branding/:portal/ws/labarchives/export': LabarchivesController.export
+        'post /:branding/:portal/ws/labarchives/notebook': LabarchivesController.getNotebook,
+        'post /:branding/:portal/ws/labarchives/export': LabarchivesController.exportNotebook,
+        'post /:branding/:portal/ws/labarchives/zipExport': LabarchivesController.zipExport,
+        'post /:branding/:portal/ws/labarchives/returnExport': LabarchivesController.returnExport,
+        'post /:branding/:portal/ws/labarchives/createDataRecord': LabarchivesController.createDataRecord
       }
     },
     configure: function () {

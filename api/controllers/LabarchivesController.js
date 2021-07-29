@@ -12,6 +12,7 @@ const rxjs_1 = require("rxjs");
 require("rxjs/add/operator/map");
 const controller = require("../core/CoreController");
 const Config_1 = require("../Config");
+const ExportConfig_1 = require("../ExportConfig");
 const UserInfo_1 = require("../UserInfo");
 var Controllers;
 (function (Controllers) {
@@ -25,9 +26,17 @@ var Controllers;
                 'link',
                 'checkLink',
                 'list',
-                'createNotebook'
+                'createNotebook',
+                'getNotebook',
+                'getNotebookInfo',
+                'exportNotebook',
+                'zipExport',
+                'returnExport',
+                'createDataRecord'
             ];
             this.config = new Config_1.Config(sails.config.workspaces);
+            const eC = sails.config.workspaces.labarchives.exportConfig;
+            this.exportConfig = new ExportConfig_1.ExportConfig(eC.host, eC.authorization, eC.exportNotebook, eC.zipNotebook, eC.returnNotebook, eC.exportDir);
         }
         info(req, res) {
             this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
@@ -169,6 +178,7 @@ var Controllers;
                     rdmpTitle: rdmpTitle,
                     title: nbName,
                     location: this.config.location,
+                    locationId: nbId,
                     description: this.config.description,
                     type: this.config.recordType
                 };
@@ -251,6 +261,31 @@ var Controllers;
                 this.ajaxFail(req, res, error.message, { status: false, message: error.message });
             });
         }
+        getNotebook(req, res) {
+            const userId = req.user.id;
+            const notebook = req.param('notebook');
+            sails.log.debug('getting notebook: ' + notebook);
+            if (!notebook) {
+                const message = 'notebook missing';
+                this.ajaxFail(req, res, message, { status: false, message: message });
+                return;
+            }
+            const nbId = notebook;
+            let info = {};
+            this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+            return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+                .subscribe((response) => __awaiter(this, void 0, void 0, function* () {
+                sails.log.debug(response);
+                info = response.info;
+                const nbInfo = yield LabarchivesService.getNotebookInfo(this.config.key, info['id'], nbId);
+                sails.log.debug(nbInfo);
+                this.ajaxOk(req, res, null, { status: true, nb: nbInfo, message: 'getNotebook' });
+            }), error => {
+                sails.log.error('getNotebook: error');
+                sails.log.error(error);
+                this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+            });
+        }
         createNotebook(req, res) {
             const userId = req.user.id;
             const name = req.param('name');
@@ -317,6 +352,242 @@ var Controllers;
                 sails.log.error('createNotebook: error');
                 sails.log.error(error);
                 this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+            });
+        }
+        getNotebookInfo(req, res) {
+            const userId = req.user.id;
+            const username = req.user.username;
+            this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+            const rdmp = req.param('rdmp');
+            const workspace = req.param('workspace');
+            if (!workspace) {
+                const message = 'no workspace provided';
+                this.ajaxFail(req, res, message, { status: false, message: message });
+            }
+            else {
+                sails.log.debug('get notebook: ' + workspace);
+                return WorkspaceService.getRecordMeta(this.config, workspace)
+                    .subscribe(response => {
+                    sails.log.debug(response);
+                    if (!response.title) {
+                        const message = 'workspace not found';
+                        this.ajaxFail(req, res, message, { status: false, message: message });
+                    }
+                    else {
+                        const nb = response;
+                        this.ajaxOk(req, res, null, { status: true, nb: nb, message: 'workspaceInfo' });
+                    }
+                }, error => {
+                    sails.log.error('getNotebookInfo: error');
+                    sails.log.error(error);
+                    this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+                });
+            }
+        }
+        exportNotebook(req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const userId = req.user.id;
+                    const username = req.user.username;
+                    this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+                    const rdmp = req.param('rdmp');
+                    const notebook = req.param('notebook');
+                    sails.log.debug('exportNotebook notebook');
+                    WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+                        .subscribe((workspaceAppInfo) => __awaiter(this, void 0, void 0, function* () {
+                        const workspaceInfo = workspaceAppInfo['info'];
+                        const exportNotebook = yield LabarchivesService.exportNotebook(this.exportConfig, workspaceInfo['id'], notebook);
+                        let exportedId;
+                        if (!exportNotebook.error) {
+                            exportedId = exportNotebook.notebookId;
+                            this.ajaxOk(req, res, null, { status: true, nb: exportedId, message: 'exportNotebook' });
+                        }
+                        else {
+                            this.ajaxFail(req, res, exportNotebook.error, { status: false, message: exportNotebook.error });
+                        }
+                    }), error => {
+                        sails.log.error(error);
+                        const message = 'error starting export';
+                        this.ajaxFail(req, res, message, { status: false, message: message });
+                    });
+                }
+                catch (error) {
+                    sails.log.error('exportNotebook: error');
+                    sails.log.error(error);
+                    this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+                }
+            });
+        }
+        zipExport(req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const userId = req.user.id;
+                    const username = req.user.username;
+                    this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+                    const rdmp = req.param('rdmp');
+                    const notebook = req.param('notebook');
+                    sails.log.debug('zipExport notebook');
+                    WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+                        .subscribe((workspaceAppInfo) => __awaiter(this, void 0, void 0, function* () {
+                        const workspaceInfo = workspaceAppInfo['info'];
+                        const exportNotebook = yield LabarchivesService.zipExport(this.exportConfig, notebook);
+                        let exportedId;
+                        if (!exportNotebook.error) {
+                            exportedId = exportNotebook.notebookId;
+                            this.ajaxOk(req, res, null, { status: true, nb: exportedId, message: 'exportNotebook' });
+                        }
+                        else {
+                            this.ajaxFail(req, res, exportNotebook.error, { status: false, message: exportNotebook.error });
+                        }
+                    }), error => {
+                        sails.log.error(error);
+                        const message = 'error starting export';
+                        this.ajaxFail(req, res, message, { status: false, message: message });
+                    });
+                }
+                catch (error) {
+                    sails.log.error('zipExport: error');
+                    sails.log.error(error);
+                    this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+                }
+            });
+        }
+        returnExport(req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const userId = req.user.id;
+                    const username = req.user.username;
+                    this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+                    const rdmp = req.param('rdmp');
+                    const notebook = req.param('notebook');
+                    sails.log.debug('returnExport notebook');
+                    WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+                        .subscribe((workspaceAppInfo) => __awaiter(this, void 0, void 0, function* () {
+                        const workspaceInfo = workspaceAppInfo['info'];
+                        const exportNotebook = yield LabarchivesService.returnExport(this.exportConfig, notebook);
+                        if (!exportNotebook.error) {
+                            sails.log.debug(exportNotebook);
+                            this.ajaxOk(req, res, null, { status: true, nb: notebook, message: 'exportNotebook' });
+                        }
+                        else {
+                            this.ajaxFail(req, res, exportNotebook.error, { status: false, message: exportNotebook.error });
+                        }
+                    }), error => {
+                        sails.log.error(error);
+                        const message = 'error starting export';
+                        this.ajaxFail(req, res, message, { status: false, message: message });
+                    });
+                }
+                catch (error) {
+                    sails.log.error('createNotebook: error');
+                    sails.log.error(error);
+                    this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+                }
+            });
+        }
+        createDataRecord(req, res) {
+            const userId = req.user.id;
+            const username = req.user.username;
+            this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+            const brandId = BrandingService.brandId;
+            const rdmp = req.param('rdmp');
+            const rdmpTitle = req.param('rdmpTitle');
+            const notebook_title = req.param('notebookTitle');
+            const notebook_file = req.param('notebookFile');
+            const isHdr = req.param('isHdr');
+            const retention = req.param('retention');
+            const disposal = req.param('disposal');
+            const isc = req.param('isc');
+            const contributor_ci = req.param('contributor_ci');
+            const contributor_data_manager = req.param('contributor_data_manager');
+            const keywords = req.param('keywords');
+            sails.log.debug('create Data Record notebook');
+            let recordId = '';
+            let recordMetadata = {};
+            return WorkspaceService.getRecordMeta(this.config, rdmp)
+                .subscribe((response) => __awaiter(this, void 0, void 0, function* () {
+                sails.log.debug('recordMetadata');
+                recordMetadata = response;
+                const metadata = {
+                    rdmp: {
+                        oid: rdmp,
+                        title: rdmpTitle
+                    },
+                    contributors_ci: recordMetadata['contributors_ci'],
+                    contributors_data_manager: recordMetadata['contributors_data_manager'],
+                    title: notebook_title,
+                    aim_project_name: rdmpTitle,
+                    project_hdr: isHdr,
+                    description: 'Data Record automatically created, please edit this field',
+                    'redbox:retentionPeriod_dc:date': retention,
+                    disposalDate: disposal,
+                    finalKeywords: keywords,
+                    contributor_ci: contributor_ci,
+                    contributor_data_manager: contributor_data_manager
+                };
+                sails.log.debug('create createDataRecord');
+                const metaMetadata = {
+                    brandId: brandId,
+                    createdBy: username,
+                    type: "dataRecord",
+                    form: "dataRecord-1.0-draft",
+                    attachmentFields: [
+                        "dataLocations"
+                    ],
+                    lastSavedBy: username
+                };
+                const createDataRecord = yield LabarchivesService.createDataRecord(this.config, username, metadata);
+                sails.log.debug('create Data Record');
+                if (createDataRecord.oid) {
+                    recordId = createDataRecord.oid;
+                    const updateMeta = yield LabarchivesService.updateMeta(this.config, recordId, metaMetadata);
+                    if (updateMeta) {
+                        sails.log.debug(updateMeta);
+                        sails.log.debug('Uploading File');
+                        const dataRecord = yield LabarchivesService.saveDataStream(this.config, this.exportConfig, recordId, notebook_file, { isc: isc });
+                        sails.log.debug(dataRecord);
+                        if (dataRecord.success) {
+                            const putDataStream = yield LabarchivesService.listDataStream(this.config, recordId);
+                            sails.log.debug(putDataStream['success']);
+                            sails.log.debug(putDataStream['records']);
+                            const dataLocations = putDataStream['records'];
+                            _.each(dataLocations, (dL) => {
+                                const location = `${dL['redboxOid']}/attach/${dL['fileId']}`;
+                                dL['type'] = 'attachment';
+                                dL['location'] = location;
+                                dL['uploadUrl'] = `${this.config.brandingAndPortalUrl}/record/${location}`;
+                                dL['isc'] = isc;
+                            });
+                            if (putDataStream.success) {
+                                metadata['dataLocations'] = dataLocations;
+                                const updateDataStream = yield LabarchivesService.updateDataRecord(this.config, recordId, metadata);
+                                if (updateDataStream.success) {
+                                    this.ajaxOk(req, res, null, { status: true, recordId: recordId, message: 'created data record' });
+                                }
+                                else {
+                                    const message = 'failed to update record with datastream';
+                                    this.ajaxFail(req, res, message, { status: false, message: message });
+                                }
+                            }
+                            else {
+                                const message = 'failed to update record with datastream';
+                                this.ajaxFail(req, res, message, { status: false, message: message });
+                            }
+                        }
+                        else {
+                            const message = 'failed to upload record';
+                            this.ajaxFail(req, res, message, { status: false, message: message });
+                        }
+                    }
+                    else {
+                        const message = 'failed to create a data record';
+                        this.ajaxFail(req, res, message, { status: false, message: message });
+                    }
+                }
+            }), error => {
+                sails.log.error(error);
+                const message = 'error starting export';
+                this.ajaxFail(req, res, message, { status: false, message: message });
             });
         }
     }

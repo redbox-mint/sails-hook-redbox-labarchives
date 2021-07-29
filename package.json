@@ -10,7 +10,7 @@
   "scripts": {
     "test": "NODE_ENV=test node_modules/.bin/mocha",
     "compile": "node_modules/.bin/tsc --project tsconfig.json",
-    "watch": "node_modules/.bin/tsc --watch typescript/**/*.ts"
+    "watch": "node_modules/.bin/tsc --watch --project tsconfig.json "
   },
   "repository": {
     "type": "git",
@@ -40,6 +40,8 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "rxjs": "6.5.2",
-    "rxjs-compat": "6.5.2"
+    "rxjs-compat": "6.5.2",
+    "axios": "^0.21.1",
+    "form-data": "^4.0.0"
   }
 }

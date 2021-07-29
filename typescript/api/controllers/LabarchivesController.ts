@@ -30,7 +30,12 @@ export module Controllers {
       'checkLink',
       'list',
       'createNotebook',
-      'export'
+      'getNotebook',
+      'getNotebookInfo',
+      'exportNotebook',
+      'zipExport',
+      'returnExport',
+      'createDataRecord'
     ];
     _config: any;
 
@@ -40,8 +45,8 @@ export module Controllers {
     constructor() {
       super();
       this.config = new Config(sails.config.workspaces);
-      const eC = sails.config.workspaces.exportConfig;
-      this.exportConfig = new ExportConfig(eC.host, eC.url, eC.authorization);
+      const eC = sails.config.workspaces.labarchives.exportConfig;
+      this.exportConfig = new ExportConfig(eC.host, eC.authorization, eC.exportNotebook, eC.zipNotebook, eC.returnNotebook, eC.exportDir);
     }
 
     public info(req, res) {
@@ -49,7 +54,7 @@ export module Controllers {
       this.ajaxOk(req, res, null, {location: this.config.location, status: true});
     }
 
-    rdmpInfo(req, res) {
+    public rdmpInfo(req, res) {
       sails.log.debug('rdmpInfo');
       const userId = req.user.id;
       const rdmp = req.param('rdmp');
@@ -67,7 +72,7 @@ export module Controllers {
         });
     }
 
-    login(req, res) {
+    public login(req, res) {
       const user = {
         username: req.param('username'),
         password: req.param('password')
@@ -106,7 +111,7 @@ export module Controllers {
       }
     }
 
-    list(req, res) {
+    public list(req, res) {
       sails.log.debug('list');
       const userId = req.user.id;
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
@@ -144,10 +149,9 @@ export module Controllers {
         });
     }
 
-    link(req, res) {
+    public link(req, res) {
       const userId = req.user.id;
       const username = req.user.username;
-
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
 
       const rdmp = req.param('rdmp');
@@ -186,6 +190,7 @@ export module Controllers {
             rdmpTitle: rdmpTitle,
             title: nbName,
             location: this.config.location, //`https://au-mynotebook.labarchives.com`,
+            locationId: nbId,
             description: this.config.description, //'LabArchives Workspace',
             type: this.config.recordType
           };
@@ -236,7 +241,7 @@ export module Controllers {
         });
     }
 
-    checkLink(req, res) {
+    public checkLink(req, res) {
       const userId = req.user.id;
       const username = req.user.username;
       const rdmp = req.param('rdmp');
@@ -273,7 +278,33 @@ export module Controllers {
         });
     }
 
-    createNotebook(req, res) {
+    public getNotebook(req, res) {
+      const userId = req.user.id;
+      const notebook = req.param('notebook');
+      sails.log.debug('getting notebook: ' + notebook);
+      if (!notebook) {
+        const message = 'notebook missing';
+        this.ajaxFail(req, res, message, {status: false, message: message});
+        return;
+      }
+      const nbId = notebook;
+      let info = {};
+      this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+      return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+        .subscribe(async response => {
+          sails.log.debug(response);
+          info = response.info;
+          const nbInfo = await LabarchivesService.getNotebookInfo(this.config.key, info['id'], nbId);
+          sails.log.debug(nbInfo);
+          this.ajaxOk(req, res, null, {status: true, nb: nbInfo, message: 'getNotebook'});
+        }, error => {
+          sails.log.error('getNotebook: error');
+          sails.log.error(error);
+          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+        });
+    }
+
+    public createNotebook(req, res) {
       const userId = req.user.id;
       const name = req.param('name');
       const userEmail = req.param('userEmail');
@@ -337,29 +368,237 @@ export module Controllers {
         });
     }
 
-    export(req, res): any {
+    public getNotebookInfo(req, res) {
+      const userId = req.user.id;
+      const username = req.user.username;
+      this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+      const rdmp = req.param('rdmp');
+      const workspace = req.param('workspace');
+      if (!workspace) {
+        const message = 'no workspace provided';
+        this.ajaxFail(req, res, message, {status: false, message: message});
+      } else {
+        sails.log.debug('get notebook: ' + workspace);
+        return WorkspaceService.getRecordMeta(this.config, workspace)
+          .subscribe(response => {
+            sails.log.debug(response);
+            if (!response.title) {
+              const message = 'workspace not found';
+              this.ajaxFail(req, res, message, {status: false, message: message});
+            } else {
+              const nb = response;
+              this.ajaxOk(req, res, null, {status: true, nb: nb, message: 'workspaceInfo'});
+            }
+          }, error => {
+            sails.log.error('getNotebookInfo: error');
+            sails.log.error(error);
+            this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+          });
+      }
+    }
+
+    public async exportNotebook(req, res): Promise<any> {
       try {
         const userId = req.user.id;
         const username = req.user.username;
         this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
         const rdmp = req.param('rdmp');
-        const notebook = req.param('workspace');
-        sails.log.debug('create notebook');
-        const workspaceInfo = await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
-        const exportNotebook = await LabarchivesService.exportNotebook(this.exportConfig, workspaceInfo['id'], notebook.id);
-        let exportedId;
-        if (!exportNotebook.error) {
-          exportedId = exportNotebook.notebookId;
-          this.ajaxOk(req, res, null, {status: true, nb: exportedId, message: 'exportNotebook'});
-        } else {
-          this.ajaxFail(req, res, exportNotebook.error, {status: false, message: exportNotebook.error});
-        }
+        const notebook = req.param('notebook');
+        sails.log.debug('exportNotebook notebook');
+        WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+          .subscribe(async workspaceAppInfo => {
+            const workspaceInfo = workspaceAppInfo['info'];
+            const exportNotebook = await LabarchivesService.exportNotebook(this.exportConfig, workspaceInfo['id'], notebook);
+            let exportedId;
+            if (!exportNotebook.error) {
+              exportedId = exportNotebook.notebookId;
+              this.ajaxOk(req, res, null, {status: true, nb: exportedId, message: 'exportNotebook'});
+            } else {
+              this.ajaxFail(req, res, exportNotebook.error, {status: false, message: exportNotebook.error});
+            }
+          }, error => {
+            sails.log.error(error);
+            const message = 'error starting export';
+            this.ajaxFail(req, res, message, {status: false, message: message});
+          });
+      } catch (error) {
+        sails.log.error('exportNotebook: error');
+        sails.log.error(error);
+        this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+      }
+    }
+
+    public async zipExport(req, res): Promise<any> {
+      try {
+        const userId = req.user.id;
+        const username = req.user.username;
+        this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+        const rdmp = req.param('rdmp');
+        const notebook = req.param('notebook');
+        sails.log.debug('zipExport notebook');
+        WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+          .subscribe(async workspaceAppInfo => {
+            const workspaceInfo = workspaceAppInfo['info'];
+            const exportNotebook = await LabarchivesService.zipExport(this.exportConfig, notebook);
+            let exportedId;
+            if (!exportNotebook.error) {
+              exportedId = exportNotebook.notebookId;
+              this.ajaxOk(req, res, null, {status: true, nb: exportedId, message: 'exportNotebook'});
+            } else {
+              this.ajaxFail(req, res, exportNotebook.error, {status: false, message: exportNotebook.error});
+            }
+          }, error => {
+            sails.log.error(error);
+            const message = 'error starting export';
+            this.ajaxFail(req, res, message, {status: false, message: message});
+          });
+      } catch (error) {
+        sails.log.error('zipExport: error');
+        sails.log.error(error);
+        this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+      }
+    }
+
+    public async returnExport(req, res): Promise<any> {
+      try {
+        const userId = req.user.id;
+        const username = req.user.username;
+        this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+        const rdmp = req.param('rdmp');
+        const notebook = req.param('notebook');
+        sails.log.debug('returnExport notebook');
+        WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
+          .subscribe(async workspaceAppInfo => {
+            const workspaceInfo = workspaceAppInfo['info'];
+            const exportNotebook = await LabarchivesService.returnExport(this.exportConfig, notebook);
+            if (!exportNotebook.error) {
+              sails.log.debug(exportNotebook);
+              this.ajaxOk(req, res, null, {status: true, nb: notebook, message: 'exportNotebook'});
+            } else {
+              this.ajaxFail(req, res, exportNotebook.error, {status: false, message: exportNotebook.error});
+            }
+          }, error => {
+            sails.log.error(error);
+            const message = 'error starting export';
+            this.ajaxFail(req, res, message, {status: false, message: message});
+          });
       } catch (error) {
         sails.log.error('createNotebook: error');
         sails.log.error(error);
         this.ajaxFail(req, res, error.message, {status: false, message: error.message});
       }
     }
-  }
 
-  module.exports = new Controllers.LabarchivesController().exports();
+    public createDataRecord(req, res) {
+      const userId = req.user.id;
+      const username = req.user.username;
+      this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
+      const brandId = BrandingService.brandId;
+      const rdmp = req.param('rdmp');
+      const rdmpTitle = req.param('rdmpTitle');
+      const notebook_title = req.param('notebookTitle');
+      const notebook_file = req.param('notebookFile');
+      const isHdr = req.param('isHdr');
+      const retention = req.param('retention');
+      const disposal = req.param('disposal');
+      const isc = req.param('isc');
+      const contributor_ci = req.param('contributor_ci');
+      const contributor_data_manager = req.param('contributor_data_manager');
+      const keywords = req.param('keywords');
+
+      sails.log.debug('create Data Record notebook');
+      // First get rdmp metadata. We need the authorization user list from the data manager and the ci
+      // /default/rdmp/api/records/metadata/{oid}
+      // create authorization view/edit for this users or all users that are in view/edit
+      // get keywords
+      // get fnci/dm objects and store in metadata
+      // write the title as the name of the notebook
+      // write a sample description
+      let recordId = '';
+      let recordMetadata = {};
+      return WorkspaceService.getRecordMeta(this.config, rdmp)
+        .subscribe(async response => {
+          sails.log.debug('recordMetadata');
+          recordMetadata = response;
+          const metadata = {
+            rdmp: {
+              oid: rdmp,
+              title: rdmpTitle
+            },
+            contributors_ci: recordMetadata['contributors_ci'],
+            contributors_data_manager: recordMetadata['contributors_data_manager'],
+            title: notebook_title,
+            aim_project_name: rdmpTitle,
+            project_hdr: isHdr,
+            description: 'Data Record automatically created, please edit this field',
+            'redbox:retentionPeriod_dc:date': retention,
+            disposalDate: disposal,
+            finalKeywords: keywords,
+            contributor_ci: contributor_ci,
+            contributor_data_manager: contributor_data_manager
+          }
+          sails.log.debug('create createDataRecord');
+          const metaMetadata = {
+            brandId: brandId,
+            createdBy: username,
+            type: "dataRecord",
+            form: "dataRecord-1.0-draft",
+            attachmentFields: [
+              "dataLocations"
+            ],
+            lastSavedBy: username
+          };
+          const createDataRecord = await LabarchivesService.createDataRecord(this.config, username, metadata);
+          sails.log.debug('create Data Record');
+          if (createDataRecord.oid) {
+            recordId = createDataRecord.oid;
+            const updateMeta = await LabarchivesService.updateMeta(this.config, recordId, metaMetadata);
+            if (updateMeta) {
+              sails.log.debug(updateMeta);
+              sails.log.debug('Uploading File');
+              const dataRecord = await LabarchivesService.saveDataStream(this.config, this.exportConfig, recordId, notebook_file, {isc: isc});
+              sails.log.debug(dataRecord);
+              if (dataRecord.success) {
+                const putDataStream = await LabarchivesService.listDataStream(this.config, recordId);
+                sails.log.debug(putDataStream['success']);
+                sails.log.debug(putDataStream['records']);
+                const dataLocations = putDataStream['records'];
+                _.each(dataLocations, (dL) => {
+                  const location = `${dL['redboxOid']}/attach/${dL['fileId']}`;
+                  dL['type'] = 'attachment';
+                  dL['location'] = location;
+                  dL['uploadUrl'] = `${this.config.brandingAndPortalUrl}/record/${location}`;
+                  dL['isc'] = isc;
+                })
+                if (putDataStream.success) {
+                  metadata['dataLocations'] = dataLocations;
+                  const updateDataStream = await LabarchivesService.updateDataRecord(this.config, recordId, metadata)
+                  if (updateDataStream.success) {
+                    this.ajaxOk(req, res, null, {status: true, recordId: recordId, message: 'created data record'});
+                  } else {
+                    const message = 'failed to update record with datastream';
+                    this.ajaxFail(req, res, message, {status: false, message: message});
+                  }
+                } else {
+                  const message = 'failed to update record with datastream';
+                  this.ajaxFail(req, res, message, {status: false, message: message});
+                }
+              } else {
+                const message = 'failed to upload record';
+                this.ajaxFail(req, res, message, {status: false, message: message});
+              }
+            } else {
+              const message = 'failed to create a data record';
+              this.ajaxFail(req, res, message, {status: false, message: message});
+            }
+          }
+        }, error => {
+          sails.log.error(error);
+          const message = 'error starting export';
+          this.ajaxFail(req, res, message, {status: false, message: message});
+        });
+    }
+  }
+}
+
+module.exports = new Controllers.LabarchivesController().exports();

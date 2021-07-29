@@ -1,18 +1,21 @@
 export class ExportConfig {
   host: string;
-  url: string;
+  exportNotebook: string;
+  zipNotebook: string;
+  returnNotebook: string;
+  exportDir: string;
   headers: any;
 
-  constructor(host, url, authorization) {
+  constructor(host, authorization, exportNotebook, zipNotebook, returnNotebook, exportDir) {
 
     this.host = host;
-    this.url = url;
+    this.exportNotebook = exportNotebook;
+    this.zipNotebook = zipNotebook;
+    this.returnNotebook = returnNotebook;
+    this.exportDir = exportDir;
     this.headers = {
-      'Cache-Control': 'no-cache',
       'Content-Type': 'application/json',
-      'Authorization': authorization
+      "Authorization": authorization //Add 'Bearer ' to this string
     };
-
-
   }
 }

@@ -97,6 +97,13 @@ module.exports = {
       }
     },
     {
+      class: 'LabarchivesExportField',
+      viewOnly: false,
+      definition: {
+        name: 'Export'
+      }
+    },
+    {
       class: "AnchorOrButton",
       viewOnly: false,
       definition: {

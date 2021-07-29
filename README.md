@@ -91,7 +91,41 @@ cd /into/redbox-portal/
 npm link sails-hook-redbox-labarchives
 ```
 
-## Vagrant/Docker
+### From Docker Engine
+
+Tu run in dev mode
+
+You can sync typescript changes however you need to sync contents with grunt
+```shell
+docker exec -it $(docker ps -f name=redbox-portal_redboxportal_1 -q) /bin/bash -c "cd /opt/hooks/sails-hook-redbox-labarchives/; npm run compile"
+```
+Compile Angular
+```shell
+docker exec -it $(docker ps -f name=redbox-portal_redboxportal_1 -q) /bin/bash -c "cd /opt/hooks/sails-hook-redbox-labarchives/angular/labarchives; npm install"
+```
+```shell
+docker exec -it $(docker ps -f name=redbox-portal_redboxportal_1 -q) /bin/bash -c "cd /opt/hooks/sails-hook-redbox-labarchives/angular/labarchives; npm run build"
+```
+
+Run Grunt to sync
+```shell
+docker exec -it $(docker ps -f name=redbox-portal_redboxportal_1 -q) /bin/bash -c "cd /opt/redbox-portal/; node_modules/.bin/grunt"
+```
+
+Run Copy of angular files
+```shell
+docker exec -it $(docker ps -f name=redbox-portal_redboxportal_1 -q) /bin/bash -c "cp -r /opt/hooks/sails-hook-redbox-labarchives/angular/labarchives/dist/* /opt/redbox-portal/assets/angular/labarchives"
+```
+```shell
+docker exec -it $(docker ps -f name=redbox-portal_redboxportal_1 -q) /bin/bash -c "cp -r /opt/hooks/sails-hook-redbox-labarchives/angular/labarchives/dist/* /opt/redbox-portal/.tmp/public/angular/labarchives"
+```
+
+Restart redbox from docker
+```shell
+docker restart $(docker ps -f name=redbox-portal_redboxportal_1 -q)
+```
+
+## Vagrant/Docker (The use of vagrant has been deprecated in favour of local docker dev)
 
 Using docker while running redbox-portal is a posibility
 

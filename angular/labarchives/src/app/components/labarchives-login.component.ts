@@ -179,7 +179,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
     </div>
   `
 })
-export class LabarchivesLoginComponent extends SimpleComponent {
+export class LabarchivesLoginComponent extends SimpleComponent implements OnInit {
   field: LabarchivesLoginField;
 
   ngOnInit() {

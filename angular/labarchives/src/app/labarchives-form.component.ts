@@ -1,20 +1,20 @@
 import {Component, Inject, Input, ElementRef, Output, EventEmitter} from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
 import {FormGroup, FormControl, Validators, NgForm} from '@angular/forms';
 import {RecordsService} from './shared/form/records.service';
 import {LoadableComponent} from './shared/loadable.component';
 import {FieldControlService} from './shared/form/field-control.service';
 import {Observable} from 'rxjs/Observable';
-import * as _ from "lodash-es";
+import * as _ from 'lodash';
+import * as jQuery from 'jquery';
 import {TranslationService} from './shared/translation-service';
 
 import {LabarchivesLoginComponent, LabarchivesLoginField} from './components/labarchives-login.component';
 import {LabarchivesListComponent, LabarchivesListField} from './components/labarchives-list.component';
 import {LabarchivesLinkField, LabarchivesLinkComponent} from './components/labarchives-link.component';
 import {LabarchivesCreateField, LabarchivesCreateComponent} from './components/labarchives-create.component';
-
-import * as jQuery from 'jquery';
-
+import {LabarchivesExportField, LabarchivesExportComponent} from './components/labarchives-export.component';
 
 /**
  * Main LabArchives Edit component
@@ -98,7 +98,10 @@ export class LabarchivesFormComponent extends LoadableComponent {
   loading: boolean = false;
   loggedIn: any;
   rdmp: string;
+  rdmpMetadata: any;
   user: any;
+  action: string;
+  workspaceId: string;
 
   constructor(
     elm: ElementRef,
@@ -112,8 +115,10 @@ export class LabarchivesFormComponent extends LoadableComponent {
     this.editMode = elm.nativeElement.getAttribute('editMode') == "true";
     this.recordType = elm.nativeElement.getAttribute('recordType');
     this.rdmp = elm.nativeElement.getAttribute('rdmp');
+    this.action = this.getParamValueQueryString('action');
+    this.workspaceId = this.getParamValueQueryString('workspaceId');
 
-    //TODO: Find out what is this next line!
+    // TODO: Find out what is this next line!
     this.fieldMap = {_rootComp: this};
     this.user = {};
 
@@ -137,7 +142,8 @@ export class LabarchivesFormComponent extends LoadableComponent {
       'LabarchivesLoginField': {'meta': LabarchivesLoginField, 'comp': LabarchivesLoginComponent},
       'LabarchivesListField': {'meta': LabarchivesListField, 'comp': LabarchivesListComponent},
       'LabarchivesLinkField': {'meta': LabarchivesLinkField, 'comp': LabarchivesLinkComponent},
-      'LabarchivesCreateField': {'meta': LabarchivesCreateField, 'comp': LabarchivesCreateComponent}
+      'LabarchivesCreateField': {'meta': LabarchivesCreateField, 'comp': LabarchivesCreateComponent},
+      'LabarchivesExportField': {'meta': LabarchivesExportField, 'comp': LabarchivesExportComponent},
     });
 
     this.RecordsService.getForm(this.oid, this.recordType, this.editMode).then((obs: any) => {
@@ -194,6 +200,16 @@ export class LabarchivesFormComponent extends LoadableComponent {
   // setWorkspaceUser(workspaceUser: WorkspaceUser) {
   //   this.workspaceUser = workspaceUser;
   // }
+
+  getParamValueQueryString( paramName ) {
+    const url = window.location.href;
+    let paramValue;
+    if (url.includes('?')) {
+      const httpParams = new HttpParams({ fromString: url.split('?')[1] });
+      paramValue = httpParams.get(paramName);
+    }
+    return paramValue;
+  }
 
 }
 

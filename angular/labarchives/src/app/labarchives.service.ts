@@ -143,12 +143,13 @@ export class LabarchivesService extends BaseService {
     }
   }
 
-  public async checkExport(workspace: any, rdmpId: string) {
-    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/export';
+  public async findNotebook(rdmp: string, workspace: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/findNotebook';
     try {
+      console.log('requesting this: ' + workspace);
       const result = await this.http.post(
         wsUrl,
-        {rdmp: rdmp},
+        {rdmp: rdmp, workspace: workspace},
         this.options
       ).toPromise();
       return Promise.resolve((this.extractData(result)));
@@ -157,4 +158,95 @@ export class LabarchivesService extends BaseService {
     }
   }
 
+  public async notebookInfo(rdmp: string, notebook: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/notebook';
+    try {
+      console.log('requesting this: ' + notebook);
+      const result = await this.http.post(
+        wsUrl,
+        {rdmp: rdmp, notebook: notebook},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
+  public async exportNotebook(rdmp: string, notebook: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/export';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {rdmp: rdmp, notebook: notebook},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
+  public async zipNotebook(notebook: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/zipExport';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {notebook: notebook},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
+  public async checkExport(workspace: any) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/checkExport';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {workspace: workspace},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
+  public async returnNotebook(notebook: string) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/returnExport';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {notebook: notebook},
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
+
+  public async createDataRecord(
+    rdmp, rdmpTitle, isHdr, notebookFile, notebookTitle,
+    retention, disposal, isc,
+    contributor_ci, contributor_data_manager, keywords) {
+    const wsUrl = this.brandingAndPortalUrl + '/ws/labarchives/createDataRecord';
+    try {
+      const result = await this.http.post(
+        wsUrl,
+        {
+          rdmp, rdmpTitle, isHdr, notebookFile, notebookTitle,
+          retention, disposal, isc,
+          contributor_ci, contributor_data_manager, keywords
+        },
+        this.options
+      ).toPromise();
+      return Promise.resolve((this.extractData(result)));
+    } catch (e) {
+      return Promise.reject(new Error(e));
+    }
+  }
 }
