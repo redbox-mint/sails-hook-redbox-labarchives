@@ -4,14 +4,15 @@ import * as la from '@uts-eresearch/provision-labarchives';
 
 import {Config} from '../Config';
 
-import services = require('../core/CoreService');
+import { Services as services } from '@researchdatabox/redbox-core-types';
+
 
 declare var sails: Sails;
 declare var WorkspaceService, _;
 
 export module Services {
 
-  export class LabarchivesService extends services.Services.Core.Service {
+  export class LabarchivesService extends services.Core.Service {
     protected config: Config;
 
     protected _exportedMethods: any = [

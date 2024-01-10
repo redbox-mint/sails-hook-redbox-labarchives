@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-redbox-labarchives",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A Sails Hook for LabArchives",
   "main": "index.js",
   "sails": {
@@ -25,14 +25,15 @@
   "author": "Moises Sacal",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@types/node": "^10.12.18",
     "@types/lodash": "^4.14.134",
+    "@types/node": "^20.10.3",
     "mocha": "^6.1.4",
     "sails": "^1.0.2",
     "supertest": "^4.0.2",
-    "typescript": "^2.9.2"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@researchdatabox/redbox-core-types": "^1.4.2",
     "@uts-eresearch/provision-labarchives": "^1.1.5",
     "lodash": "^4.17.15",
     "ncp": "^2.0.0",

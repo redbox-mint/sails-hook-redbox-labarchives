@@ -9,7 +9,7 @@ declare var BrandingService, WorkspaceService, LabarchivesService;
 /**
  * Package that contains all Controllers.
  */
-import controller = require('../core/CoreController');
+import { Controllers as controllers} from '@researchdatabox/redbox-core-types';
 import {Config} from '../Config';
 import {UserInfo} from "../UserInfo";
 
@@ -19,7 +19,7 @@ export module Controllers {
    * Omero related features....
    *
    */
-  export class LabarchivesController extends controller.Controllers.Core.Controller {
+  export class LabarchivesController extends controllers.Core.Controller  {
 
     protected _exportedMethods: any = [
       'info',
@@ -30,7 +30,7 @@ export module Controllers {
       'list',
       'createNotebook'
     ];
-    _config: any;
+    
 
     protected config: Config;
 
