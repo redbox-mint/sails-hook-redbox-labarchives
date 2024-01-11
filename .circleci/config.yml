@@ -53,6 +53,8 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+  build:
+    jobs:  
       - build_only:
           filters:
             tags:
