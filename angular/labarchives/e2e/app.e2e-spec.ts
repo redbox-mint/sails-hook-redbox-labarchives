@@ -1,10 +1,10 @@
-import { AppPage } from './app.po';
+import { AngularPage } from './app.po';
 
-describe('labarchives App', () => {
-  let page: AppPage;
+describe('angular App', () => {
+  let page: AngularPage;
 
   beforeEach(() => {
-    page = new AppPage();
+    page = new AngularPage();
   });
 
   it('should display welcome message', () => {
