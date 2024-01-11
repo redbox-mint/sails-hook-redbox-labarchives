@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Publish package
           command: npm publish --access public
-  build:
+  build_only:
     docker:
       - image: cimg/node:20.9.0
     working_directory: ~/repo
