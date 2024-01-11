@@ -6,7 +6,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: npm install && node_modules/.bin/tsc
+      - run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+      - run: nvm install && npm install && node_modules/.bin/tsc
       # run tests!
       # - run: npm test
       # # store test results
@@ -29,9 +30,10 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: npm install && node_modules/.bin/tsc
+      - run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+      - run: nvm install && npm install && node_modules/.bin/tsc
       - run: git clone https://github.com/redbox-mint/redbox-portal.git /tmp/rbportal && cp -Rf /tmp/rbportal/angular-legacy/shared/* angular/labarchives/shared/
-      - run: cd angular/labarchives && npm install && node_modules/.bin/ng build --app=labarchives
+      - run: cd angular/labarchives && nvm install && npm install && node_modules/.bin/ng build --app=labarchives
       # run tests!
       # - run: npm test
       # # store test results
