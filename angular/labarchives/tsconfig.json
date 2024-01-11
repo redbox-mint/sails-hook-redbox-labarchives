@@ -12,24 +12,8 @@
       "node_modules/@types"
     ],
     "lib": [
-      "es2017",
+      "es2016",
       "dom"
     ]
-  },
-  "types": [
-    "jquery",
-    "jasmine"
-  ],
-  "include": [
-    "src/**/*",
-    "redbox-portal/angular/shared/**/*.ts",
-    "node_modules/ng2-datetime/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts",
-    "node_modules/ng2-datetime/**/*.spec.ts",
-    "node_modules/ng2-datetime/src/ng2-datetime/*.spec.ts"
-  ],
-  "allowSyntheticDefaultImports": true
+  }
 }
