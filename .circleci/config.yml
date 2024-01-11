@@ -23,6 +23,26 @@ jobs:
       - run:
           name: Publish package
           command: npm publish --access public
+  build:
+    docker:
+      - image: cimg/node:20.9.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: npm install && node_modules/.bin/tsc
+      - run: git clone https://github.com/redbox-mint/redbox-portal.git /tmp/rbportal && cp -Rf /tmp/rbportal/angular-legacy/shared/* angular/labarchives/shared/
+      - run: cd angular/labarchives && npm install && node_modules/.bin/ng build --app=labarchives
+      # run tests!
+      # - run: npm test
+      # # store test results
+      # - store_test_results:
+      #     path: test_results
+
+      # store code coverage
+      # - persist_to_workspace:
+      #     root: ~/repo
+      #     paths: .
+      
 
 workflows:
   publish:
@@ -33,7 +53,12 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-
+      - build_only:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: /.*/
 # jobs:
 #   build:
 #     docker:
