@@ -36,7 +36,7 @@ export module Controllers {
 
     constructor() {
       super();
-      this.config = new Config(sails.config.workspaces);
+      this.config = new Config();
     }
 
     public info(req, res) {

@@ -29,7 +29,7 @@ export module Services {
 
     constructor() {
       super();
-      this.config = new Config(sails.config.workspaces);
+      this.config = new Config();
     }
 
     async login(key: any, username: string, password: string) {

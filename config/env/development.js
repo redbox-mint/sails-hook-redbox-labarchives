@@ -18,9 +18,6 @@ module.exports = {
    ***************************************************************************/
 
   workspaces: {
-    portal: {
-      authorization: 'Bearer TOKEN'
-    },
     provisionerUser: 'admin',
     parentRecord: 'rdmp',
     labarchives: {
