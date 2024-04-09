@@ -13,8 +13,7 @@ jobs:
                     export NVM_DIR="$HOME/.nvm"
                     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
       - run: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm install && npm install && node_modules/.bin/tsc
-      #- run: git clone https://github.com/redbox-mint/redbox-portal.git /tmp/rbportal && cp -Rf /tmp/rbportal/angular-legacy/shared/* angular/labarchives/shared/
-      #- run: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && cd angular/labarchives && nvm install && npm install && node_modules/.bin/ng build --app=labarchives
+      - run: chmod +x support/build/compileAngularLegacy.sh && support/build/compileAngularLegacy.sh labarchives
       # run tests!
       # - run: npm test
       # # store test results

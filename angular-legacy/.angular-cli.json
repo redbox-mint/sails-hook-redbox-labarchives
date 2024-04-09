@@ -5,9 +5,9 @@
   },
   "apps": [
     {
-      "name": "dmp",
-      "root": "src",
-      "outDir": "dist/",
+      "name": "labarchives",
+      "root": "labarchives",
+      "outDir": "../assets/angular/labarchives",
       "assets": [
         "assets",
         "favicon.ico"

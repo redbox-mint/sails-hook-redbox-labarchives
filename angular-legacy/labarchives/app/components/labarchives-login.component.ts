@@ -1,7 +1,7 @@
 import {Output, EventEmitter, Component, OnInit, Inject, Injector} from '@angular/core';
 import {FormGroup, FormControl, Validators, NgForm} from '@angular/forms';
-import {SimpleComponent} from '../shared/form/field-simple.component';
-import {FieldBase} from '../shared/form/field-base';
+import {SimpleComponent} from '../../../shared/form/field-simple.component';
+import {FieldBase} from '../../../shared/form/field-base';
 
 declare var jQuery: any;
 

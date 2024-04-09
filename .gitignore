@@ -46,3 +46,5 @@ Thumbs.db
 
 test/angular
 api/*
+angular-legacy/shared
+dist/

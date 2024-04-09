@@ -1,7 +1,7 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
-import {SharedModule} from './shared/shared.module';
+import {SharedModule} from '../../shared/shared.module';
 
 import {LabarchivesService} from "./labarchives.service";
 
