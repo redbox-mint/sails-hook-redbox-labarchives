@@ -48,3 +48,4 @@ test/angular
 api/*
 angular-legacy/shared
 dist/
+assets/angular

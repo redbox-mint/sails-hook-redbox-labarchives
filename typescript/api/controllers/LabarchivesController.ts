@@ -2,10 +2,10 @@ declare var module;
 declare var sails, Model;
 declare var _;
 
-import {Observable} from 'rxjs';
+import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 
-declare var BrandingService, WorkspaceService, LabarchivesService;
+declare var BrandingService, WorkspaceService;
 /**
  * Package that contains all Controllers.
  */
@@ -32,20 +32,17 @@ export module Controllers {
     ];
     
 
-    protected config: Config;
-
-    constructor() {
-      super();
-      this.config = new Config();
-    }
+    protected config: any = new Config();
 
     public info(req, res) {
+      this.config.set();
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
       this.ajaxOk(req, res, null, {location: this.config.location, status: true});
     }
 
     rdmpInfo(req, res) {
       sails.log.debug('rdmpInfo');
+      this.config.set();
       const userId = req.user.id;
       const rdmp = req.param('rdmp');
       let recordMetadata = {};
@@ -53,7 +50,7 @@ export module Controllers {
       return WorkspaceService.getRecordMeta(this.config, rdmp)
         .subscribe(response => {
           sails.log.debug('recordMetadata');
-          recordMetadata = response;
+          recordMetadata = response.data;
           this.ajaxOk(req, res, null, {status: true, recordMetadata: recordMetadata});
         }, error => {
           sails.log.error('recordMetadata: error');
@@ -63,6 +60,7 @@ export module Controllers {
     }
 
     login(req, res) {
+      this.config.set();
       const user = {
         username: req.param('username'),
         password: req.param('password')
@@ -71,7 +69,7 @@ export module Controllers {
         let info = {};
         const userId = req.user.id;
         this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-        const userInfo = LabarchivesService.login(this.config.key, user.username, user.password);
+        const userInfo = sails.services.labarchivesservice.login(this.config.key, user.username, user.password);
         Observable.fromPromise(userInfo).flatMap(response => {
           const userInfo = response['users'];
           if (userInfo) {
@@ -103,6 +101,7 @@ export module Controllers {
 
     list(req, res) {
       sails.log.debug('list');
+      this.config.set();
       const userId = req.user.id;
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
       let info = {};
@@ -115,7 +114,7 @@ export module Controllers {
             user = response['info'] || null;
           }
           if (user) {
-            const userInfo = LabarchivesService.userInfo(this.config.key, user['id'], true);
+            const userInfo = sails.services.labarchivesservice.userInfo(this.config.key, user['id'], true);
             return Observable.fromPromise(userInfo);
           } else {
             return Observable.throwError('cannot get user info');
@@ -140,6 +139,7 @@ export module Controllers {
     }
 
     link(req, res) {
+      this.config.set();
       const userId = req.user.id;
       const username = req.user.username;
 
@@ -162,7 +162,7 @@ export module Controllers {
         return;
       }
       let info = {};
-      let workspace: any = null;
+      let workspaceId: any = null;
       let metadataContent = '';
       let rdmpTitle = '';
       let recordMetadata = null;
@@ -170,7 +170,7 @@ export module Controllers {
       WorkspaceService.getRecordMeta(this.config, rdmp)
         .flatMap(response => {
           sails.log.debug('recordMetadata');
-          recordMetadata = response;
+          recordMetadata = response.data;
           rdmpTitle = recordMetadata.title;
           return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
         })
@@ -189,8 +189,8 @@ export module Controllers {
           );
         })
         .flatMap(response => {
-          workspace = response;
-          const insertNode = LabarchivesService.insertNode(this.config.key, info['id'], nbId, 'stash.workspace', false);
+          workspaceId = response.data.workspaceOid;
+          const insertNode = sails.services.labarchivesservice.insertNode(this.config.key, info['id'], nbId, 'stash.workspace', false);
           return Observable.fromPromise(insertNode);
 
         })
@@ -199,29 +199,29 @@ export module Controllers {
             const tree = response['tree-tools'];
             const node = tree['node'];
             metadataContent = `
-          <div id="${workspace.oid}">
+          <div id="${workspaceId}">
             <h1>UTS</h1>
             <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>
             <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>
-            <p>Stash Id: ${workspace.oid}</p>
+            <p>Stash Id: ${workspaceId}</p>
           </div>
           `;
             const partType = 'text entry';
-            const insertNode = LabarchivesService.addEntry(
+            const insertNode = sails.services.labarchivesservice.addEntry(
               this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent
             );
             return Observable.fromPromise(insertNode);
           } else return Observable.throwError(new Error('cannot insert node'));
         })
-        .flatMap(response => {
-          if (recordMetadata.workspaces) {
-            const wss = recordMetadata.workspaces.find(id => workspace.oid === id);
-            if (!wss) {
-              recordMetadata.workspaces.push({id: workspace.oid});
-            }
-          }
-          return WorkspaceService.updateRecordMeta(this.config, recordMetadata, rdmp);
-        })
+        // .flatMap(response => {
+        //   if (recordMetadata.workspaces) {
+        //     const wss = recordMetadata.workspaces.find(id => workspace.oid === id);
+        //     if (!wss) {
+        //       recordMetadata.workspaces.push({id: workspace.oid});
+        //     }
+        //   }
+        //   return WorkspaceService.updateRecordMeta(this.config, recordMetadata, rdmp);
+        // })
         .subscribe(response => {
           this.ajaxOk(req, res, null, {status: true, message: 'workspaceRecordCreated'});
         }, error => {
@@ -232,6 +232,7 @@ export module Controllers {
     }
 
     checkLink(req, res) {
+      this.config.set();
       const userId = req.user.id;
       const username = req.user.username;
       const rdmp = req.param('rdmp');
@@ -245,7 +246,7 @@ export module Controllers {
       return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
         .flatMap(response => {
           info = response.info;
-          const nbTree = LabarchivesService.getNotebookTree(this.config.key, info['id'], nbId, 0);
+          const nbTree = sails.services.labarchivesservice.getNotebookTree(this.config.key, info['id'], nbId, 0);
           return Observable.fromPromise(nbTree);
         })
         .subscribe(response => {
@@ -269,6 +270,7 @@ export module Controllers {
     }
 
     createNotebook(req, res) {
+      this.config.set();
       const userId = req.user.id;
       const name = req.param('name');
       const userEmail = req.param('userEmail');
@@ -282,7 +284,7 @@ export module Controllers {
       return WorkspaceService.getRecordMeta(this.config, rdmp)
         .flatMap(response => {
           sails.log.debug('recordMetadata');
-          recordMetadata = response;
+          recordMetadata = response.data;
           rdmpTitle = recordMetadata['title'];
           const supervisorFromRDMP = recordMetadata['contributor_ci']['email'];
           if (supervisor === supervisorFromRDMP) {
@@ -296,16 +298,16 @@ export module Controllers {
           sails.log.debug('workspaceAppFromUserId');
           info = response.info;
           sails.log.debug('userHasEmail');
-          const supervisorHasEmail = await LabarchivesService.userHasEmail(this.config.key, supervisor);
+          const supervisorHasEmail = await sails.services.labarchivesservice.userHasEmail(this.config.key, supervisor);
           if (supervisorHasEmail && supervisorHasEmail['users'] && supervisorHasEmail['users']['account-for-email']['_']) {
             sails.log.debug('createNotebook');
-            const result = await LabarchivesService.createNotebook(this.config.key, info['id'], name);
+            const result = await sails.services.labarchivesservice.createNotebook(this.config.key, info['id'], name);
             if (result && result.notebooks) {
               nb = result.notebooks;
               if (userEmail.toLowerCase() === supervisor.toLowerCase()) {
                 return Observable.of(nb);
               } else {
-                const addUser = await LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'ADMINISTRATOR');
+                const addUser = await sails.services.labarchivesservice.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'ADMINISTRATOR');
                 sails.log.debug('addUser');
                 if (addUser) {
                   const nbu = addUser.notebooks['notebook-user'];

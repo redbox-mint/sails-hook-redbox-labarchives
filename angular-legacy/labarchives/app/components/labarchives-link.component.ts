@@ -144,10 +144,10 @@ export class LabarchivesLinkField extends FieldBase<any> {
           <div class="modal-footer">
             <span *ngIf="field.processing; then waitForProcessing; else finishProcessing"></span>
             <ng-template #finishProcessing>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ field.closeLabel }}</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ field.closeLabel }}</button>
             </ng-template>
             <ng-template #waitForProcessing>
-              <button type="button" class="btn btn-secondary disabled" data-dismiss="modal">{{ field.closeLabel }}
+              <button type="button" class="btn btn-secondary disabled" data-bs-dismiss="modal">{{ field.closeLabel }}
               </button>
             </ng-template>
           </div>

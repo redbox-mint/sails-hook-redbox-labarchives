@@ -4,7 +4,7 @@ module.exports = function (sails) {
     initialize: function (cb) {
       const initPreReq = ["hook:redbox-storage-mongo:loaded"];
       sails.after(initPreReq, function() {
-        global.ConfigService.mergeHookConfig('sails-hook-redbox-labarchives', sails.config);
+        global.ConfigService.mergeHookConfig('@researchdatabox/sails-hook-redbox-labarchives', sails.config);
         return cb();
       });
     },

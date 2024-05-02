@@ -77,7 +77,8 @@ export class LabarchivesLoginField extends FieldBase<any> {
     if (formValid === '') {
       // TODO: Investigate this. Using this method to remove the trailing Base64 equals ==
       form.password = form.password.trim();
-      form.password = form.password.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      // Commented out line below as it doesn't make sense why certain characters should be stripped
+      // form.password = form.password.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       this.user = {username: this.userEmail, password: form.password};
       const login = await this.labarchivesService.login(this.user.username, this.user.password);
       if (login.status) {
@@ -172,7 +173,7 @@ export class LabarchivesLoginField extends FieldBase<any> {
             <p>Login not available please use Key method</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ field.closeLabel }}</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ field.closeLabel }}</button>
           </div>
         </div>
       </div>

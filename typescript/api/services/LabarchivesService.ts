@@ -2,8 +2,6 @@ import {Sails, Model} from 'sails';
 
 import * as la from '@uts-eresearch/provision-labarchives';
 
-import {Config} from '../Config';
-
 import { Services as services } from '@researchdatabox/redbox-core-types';
 
 
@@ -13,8 +11,6 @@ declare var WorkspaceService, _;
 export module Services {
 
   export class LabarchivesService extends services.Core.Service {
-    protected config: Config;
-
     protected _exportedMethods: any = [
       'login',
       'userInfo',
@@ -29,7 +25,7 @@ export module Services {
 
     constructor() {
       super();
-      this.config = new Config();
+      this.logHeader = "LabArchivesService::"
     }
 
     async login(key: any, username: string, password: string) {
@@ -141,6 +137,8 @@ export module Services {
           return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
         }
       } catch (e) {
+        sails.log.error(`${this.logHeader}userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
         return Promise.reject(new Error(e));
       }
     }
