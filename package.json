@@ -1,6 +1,6 @@
 {
   "name": "@researchdatabox/sails-hook-redbox-labarchives",
-  "version": "0.0.1-prerelease",
+  "version": "0.0.2-prerelease",
   "description": "A Sails Hook for LabArchives",
   "main": "index.js",
   "sails": {
