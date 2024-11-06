@@ -84,7 +84,7 @@ module.exports.form = {
             name: 'Create',
             createButton: 'Create Notebook',
             supervisorFailMessage: 'FNCI/Supervisor has not logged in to LabArchives',
-            createNotebookHelp: 'Creating a notebook with Stash will try yo add your RDMP FNCI/Supervisor to your notebook. It will also then add information about your Data Management Plan on it',
+            createNotebookHelp: 'Creating a notebook with Stash will try to add your RDMP FNCI/Supervisor to your notebook. It will also then add information about your Data Management Plan on it',
             createNotebookHelp2: 'Give your notebook a name that is related to your research',
             notebookLabel: 'Notebook Name',
             supervisorLabel: 'RDMP FNCI/Supervisor',

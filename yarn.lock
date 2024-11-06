@@ -2,6 +2,17 @@
 # yarn lockfile v1
 
 
+"@researchdatabox/provision-labarchives@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.npmjs.org/@researchdatabox/provision-labarchives/-/provision-labarchives-1.1.7.tgz"
+  integrity sha512-s7R5HCeB3pKr9BCroNdzw0XtFuKkFNce2VuJr0YcXboLR2bed9dJRK9Fjq82yiam3AEZpUFuemb2qSxakfUqYg==
+  dependencies:
+    axios "^0.21.1"
+    common-tags "^1.4.0"
+    lodash "^4.17.21"
+    underscore "^1.12.1"
+    xml2js "^0.4.19"
+
 "@researchdatabox/redbox-core-types@^1.4.2":
   version "1.4.2"
   resolved "https://registry.npmjs.org/@researchdatabox/redbox-core-types/-/redbox-core-types-1.4.2.tgz"
@@ -30,17 +41,6 @@
   integrity sha512-f8nQs3cLxbAFc00vEU59yf9UyGUftkPaLGfvbVOIDdx2i1b8epBqj2aNGyP19fiyXWvlmZ7qC1XLjAzw/OKIeA==
   dependencies:
     undici-types "~5.26.4"
-
-"@uts-eresearch/provision-labarchives@^1.1.5":
-  version "1.1.6"
-  resolved "https://registry.npmjs.org/@uts-eresearch/provision-labarchives/-/provision-labarchives-1.1.6.tgz"
-  integrity sha512-SvI8casUwKtL6zvOULDcEfZv2mzdfzdoz1W6MyLsqJa9vyah8jCOHxyGFVyh+4fbLl7cizl4vVu7UwGGWsB1rQ==
-  dependencies:
-    axios "^0.21.1"
-    common-tags "^1.4.0"
-    lodash "^4.17.21"
-    underscore "^1.12.1"
-    xml2js "^0.4.19"
 
 accepts@~1.3.4:
   version "1.3.5"
@@ -796,9 +796,9 @@ flaverr@^1.0.0, flaverr@^1.1.1, flaverr@^1.5.1, flaverr@^1.7.0, flaverr@^1.9.0:
     "@sailshq/lodash" "^3.10.2"
 
 follow-redirects@^1.14.0:
-  version "1.15.4"
-  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.4.tgz"
-  integrity sha512-Cr4D/5wlrb0z9dgERpUL3LrmPKVDsETIJhaCMeDfuFYcqa5bldGV6wBsAN6X/vxlXQtFBMrXdXxdL8CbDTGniw==
+  version "1.15.9"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.9.tgz"
+  integrity sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==
 
 forever-agent@~0.6.1:
   version "0.6.1"
@@ -1231,12 +1231,7 @@ lodash@^3.10.1:
   resolved "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
   integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
-lodash@^4.14.0, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.8.0:
-  version "4.17.15"
-  resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.15.tgz"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
-
-lodash@^4.17.21:
+lodash@^4.14.0, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.21, lodash@^4.8.0:
   version "4.17.21"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -2099,9 +2094,9 @@ sails@^1.0.2:
     whelk "^6.0.0"
 
 sax@>=0.6.0:
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/sax/-/sax-1.3.0.tgz"
-  integrity sha512-0s+oAmw9zLl1V1cS9BtZN7JAd0cW5e0QH4W3LWEK6a4LaLEA2OTpGYWDY+6XasBLtz6wkm3u1xRw95mRuJ59WA==
+  version "1.4.1"
+  resolved "https://registry.npmjs.org/sax/-/sax-1.4.1.tgz"
+  integrity sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==
 
 semver@^5.5.0:
   version "5.7.0"
@@ -2485,9 +2480,9 @@ uid-safe@2.1.4:
     random-bytes "~1.0.0"
 
 underscore@^1.12.1:
-  version "1.13.6"
-  resolved "https://registry.npmjs.org/underscore/-/underscore-1.13.6.tgz"
-  integrity sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==
+  version "1.13.7"
+  resolved "https://registry.npmjs.org/underscore/-/underscore-1.13.7.tgz"
+  integrity sha512-GMXzWtsc57XAtguZgaQViUOzs0KTkk8ojr3/xAxXLITqf/3EMwxC0inyETfDFjH/Krbhuep0HNbbjI9i/q3F3g==
 
 undici-types@~5.26.4:
   version "5.26.5"

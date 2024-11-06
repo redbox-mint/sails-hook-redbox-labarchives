@@ -102,9 +102,13 @@ export class LabarchivesLinkField extends FieldBase<any> {
         this.checks.master = true;
         this.processingFail = undefined;
         this.list.emit();
-      } else if(link.message === 'cannot insert node'){
-        this.processingFail = this.processingNoPermission;
-        this.checks.linkWithOther = true
+      } else {
+        if(link.message === 'cannot insert node'){
+          this.processingFail = this.processingNoPermission;
+          this.checks.linkWithOther = true
+        } else {
+          this.processingFail = link.message;
+        }
       }
     } catch (e) {
       this.processing = false;

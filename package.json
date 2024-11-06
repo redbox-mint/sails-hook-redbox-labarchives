@@ -1,6 +1,6 @@
 {
   "name": "@researchdatabox/sails-hook-redbox-labarchives",
-  "version": "0.0.2-prerelease",
+  "version": "0.0.3-prerelease",
   "description": "A Sails Hook for LabArchives",
   "main": "index.js",
   "sails": {
@@ -31,8 +31,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@researchdatabox/provision-labarchives": "^1.1.7",
     "@researchdatabox/redbox-core-types": "^1.4.2",
-    "@uts-eresearch/provision-labarchives": "^1.1.5",
     "lodash": "^4.17.15",
     "ncp": "^2.0.0",
     "path-exists": "^4.0.0",

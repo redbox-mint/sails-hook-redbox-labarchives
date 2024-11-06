@@ -47,6 +47,9 @@ export class LabarchivesCreateField extends FieldBase<any> {
   userEmail: string;
   notebookName: string;
   supervisorEmail: string;
+  errorMessageMap = {
+    createErrorMessage: 'There was an error creating your notebook'
+  };
   errorMessages: Array<string> = [];
 
   @Input() LinkItem: EventEmitter<any> = new EventEmitter<any>();
@@ -78,6 +81,7 @@ export class LabarchivesCreateField extends FieldBase<any> {
     this.processingNoPermission = options['processingNoPermission'] || 'You are not allowed to modify this item'
     this.processingLabel = options['processingLabel'] || 'Processing...';
     this.processingMessage = '';
+    this.errorMessageMap = options['errorMessageMap'] || this.errorMessageMap;
     this.checks = new Checks();
   }
 
@@ -134,13 +138,22 @@ export class LabarchivesCreateField extends FieldBase<any> {
         this.processingStatus = 'Creating Notebook...';
         const createNotebook = await this.labarchivesService.createNotebook(this.rdmp, this.notebookName, this.supervisorEmail, this.userEmail);
         console.log(createNotebook);
+        if (createNotebook.status === false) {
+          this.processingStatus = "";
+          this.errorMessages = [this.errorMessageMap['createErrorMessage']];
+          if (createNotebook.message) {
+            this.errorMessages = [createNotebook.message]; 
+          }
+          this.processing = false;
+          return;
+        }
         this.processingStart = false;
         this.processingFinished = true;
         this.processingStatus = 'Your notebook has been created';
         jQuery('#createModal').modal('hide');
         this.link.emit({name: createNotebook.name, id: createNotebook.nb});
       } catch (e) {
-        this.processingStatus = 'There was an error creating your notebook';
+        this.processingStatus = this.errorMessageMap['createErrorMessage'];
       }
     } else {
       this.processingFail = '';
@@ -195,17 +208,17 @@ export class LabarchivesCreateField extends FieldBase<any> {
                        attr.aria-label="{{ field.supervisorEmail }}" disabled="true">
               </div>
               <div class="form-group">
-                <button *ngIf="waitForProcessing" type="button" class="form-control btn btn-block btn-primary"
+                <button *ngIf="waitForProcessing && field.errorMessages.length == 0" type="button" class="form-control btn btn-block btn-primary"
                         (click)="field.createNotebook()"
                         attr.aria-label="{{ field.createNotebookLabel }}">{{ field.createNotebookLabel }}</button>
               </div>
               <div class="form-group">
                 <div>{{ field.processingStatus }}</div>
               </div>
-              <div class="form-group">
-                <div class="alert-danger">
-                  <ul class="list-group">
-                    <li class="list-group-item" *ngFor="let msg of field.errorMessages">{{msg}}</li>
+              <div class="form-group" *ngIf="field.errorMessages.length > 0">
+                <div class="alert alert-danger" role="alert">
+                  <ul>
+                    <li *ngFor="let msg of field.errorMessages">{{msg}}</li>
                   </ul>
                 </div>
               </div>

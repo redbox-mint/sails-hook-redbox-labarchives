@@ -1,6 +1,6 @@
 import {Sails, Model} from 'sails';
 
-import * as la from '@uts-eresearch/provision-labarchives';
+import * as la from '@researchdatabox/provision-labarchives';
 
 import { Services as services } from '@researchdatabox/redbox-core-types';
 
@@ -33,10 +33,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.accessInfo(key, username, password);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
 
     }
@@ -46,10 +49,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.userInfoViaId(key, userId);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
 
     }
@@ -59,10 +65,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.insertNode(key, userId, nbId, 0, displayText, false);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
 
     }
@@ -73,10 +82,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.addEntry(key, userId, nbId, treeId, partType, metadata);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
 
     }
@@ -86,10 +98,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.getNotebookInfo(key, userId, nbId);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
     }
 
@@ -98,10 +113,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.getTree(key, userId, nbId, treeLevel);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
     }
 
@@ -110,10 +128,13 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.createNotebook(key, userId, name);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
     }
 
@@ -122,24 +143,29 @@ export module Services {
         if (key && key['akid'] && key['password']) {
           return await la.addUserToNotebook(key, uid, nbid, email, userRole);
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        return Promise.reject(new Error(e));
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
+        sails.log.error(e);
+        throw new Error(e);
       }
     }
 
     async userHasEmail(key: any, email: string) {
       try {
         if (key && key['akid'] && key['password']) {
-          return await la.emailHasAccount(key, email);
+          const response = await la.emailHasAccount(key, email);
+          return response;
         } else {
-          return Promise.reject(new Error('missing keys for accessing lab archives APIs'));
+          sails.log.error(`Missing keys for LA api`);
+          throw new Error('missing keys for accessing lab archives APIs');
         }
       } catch (e) {
-        sails.log.error(`${this.logHeader}userHasEmail() -> Failed LA api call:`);
+        sails.log.error(`userHasEmail() -> Failed LA api call:`);
         sails.log.error(e);
-        return Promise.reject(new Error(e));
+        throw new Error(e);
       }
     }
 
