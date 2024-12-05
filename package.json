@@ -1,6 +1,6 @@
 {
-  "name": "sails-hook-redbox-labarchives",
-  "version": "1.0.2",
+  "name": "@researchdatabox/sails-hook-redbox-labarchives",
+  "version": "1.0.0",
   "description": "A Sails Hook for LabArchives",
   "main": "index.js",
   "sails": {
@@ -8,13 +8,11 @@
     "hookName": "labarchives"
   },
   "scripts": {
-    "test": "NODE_ENV=test node_modules/.bin/mocha",
-    "compile": "node_modules/.bin/tsc --project tsconfig.json",
-    "watch": "node_modules/.bin/tsc --watch typescript/**/*.ts"
+    "test": "NODE_ENV=test node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git@code.research.uts.edu.au:eresearch/sails-hook-redbox-labarchives.git"
+    "url": "https://github.com/redbox-mint/sails-hook-redbox-labarchives.git"
   },
   "keywords": [
     "sails",
@@ -22,18 +20,19 @@
     "redbox",
     "provisioner"
   ],
-  "author": "Moises Sacal",
+  "author": "QCIF Engineering",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@types/node": "^10.12.18",
     "@types/lodash": "^4.14.134",
+    "@types/node": "^20.10.3",
     "mocha": "^6.1.4",
     "sails": "^1.0.2",
     "supertest": "^4.0.2",
-    "typescript": "^2.9.2"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@uts-eresearch/provision-labarchives": "^1.1.5",
+    "@researchdatabox/provision-labarchives": "^1.1.7",
+    "@researchdatabox/redbox-core-types": "^1.4.2",
     "lodash": "^4.17.15",
     "ncp": "^2.0.0",
     "path-exists": "^4.0.0",

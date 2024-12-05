@@ -1,0 +1,10 @@
+.circleci
+support
+test
+.editorconfig
+.gitignore
+angular-legacy
+.idea
+typescript
+.nvmrc
+tsconfig.json

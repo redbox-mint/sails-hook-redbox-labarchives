@@ -1,10 +1,13 @@
 module.exports.workspacetype = {
   'labarchives': {
     name: 'labarchives',
-    label: 'eNotebooks',
-    subtitle: 'eNotebooks',
-    description: 'Create or link eNotebooks (LabArchives) workspace:',
-    logo: '/angular/labarchives/assets/images/la.png',
-    action: {default: 'list', available: ['create', 'list']}
+    label: 'LabArchives',
+    subtitle: 'LabArchives',
+    description: 'Web-based electronic notebooks (provided by LabArchives) are useful for managing research documentation, observations and data.',
+    logo: '/images/la.png',
+    action: {default: 'list', available: ['create', 'list']},
+    app: {
+      id: 'labarchives'
+    }
   }
 };

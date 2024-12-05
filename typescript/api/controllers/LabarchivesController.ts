@@ -2,14 +2,14 @@ declare var module;
 declare var sails, Model;
 declare var _;
 
-import {Observable} from 'rxjs';
+import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 
-declare var BrandingService, WorkspaceService, LabarchivesService;
+declare var BrandingService, WorkspaceService, RecordsService;
 /**
  * Package that contains all Controllers.
  */
-import controller = require('../core/CoreController');
+import { Controllers as controllers} from '@researchdatabox/redbox-core-types';
 import {Config} from '../Config';
 import {UserInfo} from "../UserInfo";
 
@@ -19,7 +19,7 @@ export module Controllers {
    * Omero related features....
    *
    */
-  export class LabarchivesController extends controller.Controllers.Core.Controller {
+  export class LabarchivesController extends controllers.Core.Controller  {
 
     protected _exportedMethods: any = [
       'info',
@@ -30,121 +30,135 @@ export module Controllers {
       'list',
       'createNotebook'
     ];
-    _config: any;
+    
 
-    protected config: Config;
-
-    constructor() {
-      super();
-      this.config = new Config(sails.config.workspaces);
-    }
+    protected config: any = new Config();
+    protected logHeader: string = "LabArchivesController::";
 
     public info(req, res) {
+      this.config.set();
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
       this.ajaxOk(req, res, null, {location: this.config.location, status: true});
     }
 
-    rdmpInfo(req, res) {
-      sails.log.debug('rdmpInfo');
+    async rdmpInfo(req, res) {
+      this.config.set();
       const userId = req.user.id;
       const rdmp = req.param('rdmp');
       let recordMetadata = {};
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-      return WorkspaceService.getRecordMeta(this.config, rdmp)
-        .subscribe(response => {
-          sails.log.debug('recordMetadata');
-          recordMetadata = response;
-          this.ajaxOk(req, res, null, {status: true, recordMetadata: recordMetadata});
-        }, error => {
-          sails.log.error('recordMetadata: error');
-          sails.log.error(error);
-          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
-        });
+      let infoResp = {status: false, message: "Error retrieving associated RDMP, please contact an administrator."};
+      try {
+        recordMetadata = await RecordsService.getMeta(rdmp);
+        if (recordMetadata) {
+          infoResp.status = true;
+          infoResp['recordMetadata'] = recordMetadata['metadata'];
+        } 
+      } catch (err) {
+        sails.log.error(`${this.logHeader} rdmpInfo() -> Failed to get metadata:`);
+        sails.log.error(err);
+      }
+      if (infoResp.status === false) {
+        this.ajaxFail(req, res, infoResp.message, infoResp);
+      } else {
+        this.ajaxOk(req, res, null, infoResp);
+      }
     }
 
-    login(req, res) {
+    async login(req, res) {
+      this.config.set();
       const user = {
         username: req.param('username'),
         password: req.param('password')
       };
+      const loginResp = {status: false, message: 'Username and/or password invalid'};
       if (user.username && user.password) {
         let info = {};
         const userId = req.user.id;
         this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-        const userInfo = LabarchivesService.login(this.config.key, user.username, user.password);
-        Observable.fromPromise(userInfo).flatMap(response => {
-          const userInfo = response['users'];
-          if (userInfo) {
+        try {
+          let userInfo = await sails.services.labarchivesservice.login(this.config.key, user.username, user.password);
+          if (userInfo && userInfo['users']) {
+            userInfo = userInfo['users'];
             info = new UserInfo(userInfo['id'], userInfo['orcid'], userInfo['fullname']);
-            return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
-          } else {
-            //Doing this because if the password is incorrect labarchives returns a 404!
-            const message = 'username and password invalid';
-            throw new Error(message);
-          }
-        }).flatMap(response => {
-          if (response && response['id']) {
-            return WorkspaceService.updateWorkspaceInfo(response['id'], info);
-          } else {
-            return WorkspaceService.createWorkspaceInfo(userId, this.config.appName, info);
-          }
-        }).subscribe(response => {
-          this.ajaxOk(req, res, null, {status: true, login: true});
-        }, error => {
-          const errorMessage = `Failed to login for user ${user.username}`;
-          sails.log.error(error);
-          this.ajaxFail(req, res, errorMessage, {status: false, message: errorMessage});
-        });
+            const workspaceInfo = await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName).toPromise();
+            if (workspaceInfo && workspaceInfo['id']) {
+              await WorkspaceService.updateWorkspaceInfo(workspaceInfo['id'], info).toPromise();
+            } else {
+              await WorkspaceService.createWorkspaceInfo(userId, this.config.appName, info).toPromise();
+            }
+            loginResp.status = true;
+            loginResp['login'] = true;
+          } 
+        } catch (err) {
+          sails.log.error(`${this.logHeader} login() -> Error: `);
+          sails.log.error(err);
+          loginResp.message = `Error logging in, please contact an administrator.`;
+        }
       } else {
-        const message = 'Input username and password';
-        this.ajaxFail(req, res, message, {status: false, message: message});
+        loginResp.message = 'Missing username and/or password';
+      }
+
+      if (loginResp.status === true) {
+        this.ajaxOk(req, res, null, loginResp);
+      } else {
+        this.ajaxFail(req, res, loginResp.message, loginResp);
       }
     }
 
-    list(req, res) {
-      sails.log.debug('list');
+    async list(req, res) {
+      this.config.set();
       const userId = req.user.id;
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-      let info = {};
-      return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
-        .flatMap(response => {
-          let user = null;
-          if (!response) {
-            user = null;
-          } else {
-            user = response['info'] || null;
-          }
-          if (user) {
-            const userInfo = LabarchivesService.userInfo(this.config.key, user['id'], true);
-            return Observable.fromPromise(userInfo);
-          } else {
-            return Observable.throwError('cannot get user info');
-          }
-        })
-        .subscribe(response => {
-          let resNotebooks = response['users']['notebooks'];
-          let notebooks = {'$': { type: 'array' }, notebook: []};
-          if(Array.isArray(resNotebooks['notebook'])) {
-            notebooks['notebook'] = resNotebooks['notebook'];
-          } else {
-            if(resNotebooks['notebook']){
-              notebooks['notebook'] = [resNotebooks['notebook']];
+      let listResp = {status: false, message: `Failed to retrieve list, please contact and administrator.`};
+      try {
+        const workspaceApp = await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName).toPromise();
+        let user = null;
+        if (!workspaceApp) {
+          user = null;
+        } else {
+          user = workspaceApp['info'] || null;
+        }
+        if (user) {
+          const userInfo = await sails.services.labarchivesservice.userInfo(this.config.key, user['id'], true);
+          if (userInfo) {
+            let resNotebooks = userInfo['users']['notebooks'];
+            let notebooks = {'$': { type: 'array' }, notebook: []};
+            if(Array.isArray(resNotebooks['notebook'])) {
+              notebooks['notebook'] = resNotebooks['notebook'];
+            } else {
+              if(resNotebooks['notebook']){
+                notebooks['notebook'] = [resNotebooks['notebook']];
+              }
             }
+            listResp.status = true;
+            listResp['notebooks'] = notebooks;
+            listResp.message = 'list';
+          } else {
+            listResp.message = `Failed to get user information, please contact an administrator.`;  
+            sails.log.error(`${this.logHeader} list() ->  failed to retrieve user info`);
           }
-          this.ajaxOk(req, res, null, {status: true, notebooks: notebooks, message: 'list'});
-        }, error => {
-          sails.log.error('list: error');
-          sails.log.error(error);
-          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
-        });
+        } else {
+          listResp.message = `Failed to get workspace information, please contact an administrator.`;
+          sails.log.error(`${this.logHeader} list() -> Failed to get workspace app info`);
+        }
+      } catch (err) {
+        sails.log.error(`${this.logHeader} list() -> Failed to list:`);
+        sails.log.error(err);
+      }
+      // send response
+      if (listResp.status === true) {
+        this.ajaxOk(req, res, listResp.message, listResp);
+      } else {
+        this.ajaxFail(req, res, listResp.message, listResp);
+      }
     }
 
-    link(req, res) {
+    async link(req, res) {
+      this.config.set();
       const userId = req.user.id;
       const username = req.user.username;
-
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-
       const rdmp = req.param('rdmp');
       const notebook = req.param('workspace');
       if (!notebook || !rdmp) {
@@ -162,76 +176,79 @@ export module Controllers {
         return;
       }
       let info = {};
-      let workspace: any = null;
+      let workspaceId: any = null;
       let metadataContent = '';
       let rdmpTitle = '';
       let recordMetadata = null;
-
-      WorkspaceService.getRecordMeta(this.config, rdmp)
-        .flatMap(response => {
-          sails.log.debug('recordMetadata');
-          recordMetadata = response;
+      const linkResp = {status: false, message: `Failed to link, please contact an administrator.`};
+      try {
+        recordMetadata = (await RecordsService.getMeta(rdmp))?.metadata;
+        if (recordMetadata) {
           rdmpTitle = recordMetadata.title;
-          return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
-        })
-        .flatMap(response => {
-          info = response.info;
-          const record = {
-            rdmpOid: rdmp,
-            rdmpTitle: rdmpTitle,
-            title: nbName,
-            location: this.config.location, //`https://au-mynotebook.labarchives.com`,
-            description: this.config.description, //'LabArchives Workspace',
-            type: this.config.recordType
-          };
-          return WorkspaceService.createWorkspaceRecord(
-            this.config, username, record, this.config.recordType, this.config.workflowStage
-          );
-        })
-        .flatMap(response => {
-          workspace = response;
-          const insertNode = LabarchivesService.insertNode(this.config.key, info['id'], nbId, 'stash.workspace', false);
-          return Observable.fromPromise(insertNode);
-
-        })
-        .flatMap(response => {
-          if (response && response['tree-tools']) {
-            const tree = response['tree-tools'];
-            const node = tree['node'];
-            metadataContent = `
-          <div id="${workspace.oid}">
-            <h1>UTS</h1>
-            <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>
-            <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>
-            <p>Stash Id: ${workspace.oid}</p>
-          </div>
-          `;
-            const partType = 'text entry';
-            const insertNode = LabarchivesService.addEntry(
-              this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent
-            );
-            return Observable.fromPromise(insertNode);
-          } else return Observable.throwError(new Error('cannot insert node'));
-        })
-        .flatMap(response => {
-          if (recordMetadata.workspaces) {
-            const wss = recordMetadata.workspaces.find(id => workspace.oid === id);
-            if (!wss) {
-              recordMetadata.workspaces.push({id: workspace.oid});
+          info = (await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName).toPromise())?.info;
+          if (info) {
+            const record = {
+              rdmpOid: rdmp,
+              rdmpTitle: rdmpTitle,
+              title: nbName,
+              location: this.config.location, //`https://au-mynotebook.labarchives.com`,
+              description: this.config.description, //'LabArchives Workspace',
+              type: this.config.recordType
+            };
+            const createResp = await WorkspaceService.createWorkspaceRecord(
+              this.config, username, record, this.config.recordType, this.config.workflowStage
+            ).toPromise();
+            if (createResp) {
+              workspaceId = createResp.data.workspaceOid;
+              const insertNodeResp = await sails.services.labarchivesservice.insertNode(this.config.key, info['id'], nbId, 'stash.workspace', false);
+              if (insertNodeResp && insertNodeResp['tree-tools']) {
+                const tree = insertNodeResp['tree-tools'];
+                const node = tree['node'];
+                metadataContent = `
+              <div id="${workspaceId}">
+                <h1>UTS</h1>
+                <h3>Workspace <strong>${nbName}</strong> is linked to:</h3>
+                <h2>Research Data Management Plan <a href="${this.config.brandingAndPortalUrl}/record/view/${rdmp}">${rdmpTitle}</a></h2>
+                <p>Stash Id: ${workspaceId}</p>
+              </div>
+              `;
+                const partType = 'text entry';
+                const insertNode = await sails.services.labarchivesservice.addEntry(
+                  this.config.key, info['id'], nbId, node['tree-id'], partType, metadataContent
+                );
+                if (insertNode) {
+                  linkResp.status = true;
+                  linkResp.message = 'workspaceRecordCreated';
+                } else {
+                  sails.log.error(`${this.logHeader} link() -> Failed in sails.services.labarchivesservice.addEntry`);
+                }
+              } else {
+                sails.log.error(`${this.logHeader} link() -> LabArchives insertNode failed:`);
+                sails.log.error(insertNodeResp);
+              }
+            } else {
+              sails.log.error(`${this.logHeader} link() -> Failed to create workspace record.`);
             }
+          } else {
+            sails.log.error(`${this.logHeader} link() -> Failed to get workspace app info.`);
           }
-          return WorkspaceService.updateRecordMeta(this.config, recordMetadata, rdmp);
-        })
-        .subscribe(response => {
-          this.ajaxOk(req, res, null, {status: true, message: 'workspaceRecordCreated'});
-        }, error => {
-          sails.log.error('link: error');
-          sails.log.error(error);
-          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
-        });
+        } else {
+          linkResp.message = `Failed to get RDMP, please contact an administrator.`;
+        }
+      } catch (err) {
+        sails.log.error(`${this.logHeader} link() -> Failed to link:`);
+        sails.log.error(err);
+      }
+      // send response
+      if (linkResp.status === true) {
+        this.ajaxOk(req, res, null, linkResp);
+      } else {
+        this.ajaxFail(req, res, linkResp.message, linkResp);
+      }
     }
 
-    checkLink(req, res) {
+    async checkLink(req, res) {
+      this.config.set();
       const userId = req.user.id;
       const username = req.user.username;
       const rdmp = req.param('rdmp');
@@ -242,15 +259,14 @@ export module Controllers {
         link: ''
       };
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-      return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName)
-        .flatMap(response => {
-          info = response.info;
-          const nbTree = LabarchivesService.getNotebookTree(this.config.key, info['id'], nbId, 0);
-          return Observable.fromPromise(nbTree);
-        })
-        .subscribe(response => {
-          if (response['tree-tools'] && response['tree-tools']['level-nodes']) {
-            const lvlNodes = response['tree-tools']['level-nodes'];
+      const checkLinkResp = {status: false, message: `Failed to check link, please contact an administrator.`};
+      try {
+        info = await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName).toPromise();
+        if (info) {
+          info = info['info'];
+          const nbTree = await sails.services.labarchivesservice.getNotebookTree(this.config.key, info['id'], nbId, 0);
+          if (nbTree['tree-tools'] && nbTree['tree-tools']['level-nodes']) {
+            const lvlNodes = nbTree['tree-tools']['level-nodes'];
             const nodes = lvlNodes['level-node'];
             if (Array.isArray(nodes)) {
               nodes.map(node => {
@@ -260,15 +276,26 @@ export module Controllers {
               });
             }
           }
-          this.ajaxOk(req, res, null, {status: true, check: check, message: 'checkLink'});
-        }, error => {
-          sails.log.error('checkLink: error');
-          sails.log.error(error);
-          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
-        });
+          checkLinkResp['check'] = check;
+          checkLinkResp.message = 'checkLink';
+          checkLinkResp.status = true;
+        } else {
+          sails.log.error(`${this.logHeader} checkLink() -> Failed to get workspace app info`);
+        }
+      } catch (err) {
+        sails.log.error(`${this.logHeader} checkLink() -> Failed to check link:`);
+        sails.log.error(err);
+      }
+      // sending response
+      if (checkLinkResp.status === true) {
+        this.ajaxOk(req, res, null, checkLinkResp);
+      } else {
+        this.ajaxFail(req, res, checkLinkResp.message, checkLinkResp);
+      }
     }
 
-    createNotebook(req, res) {
+    public async createNotebook(req, res): Promise<any> {
+      this.config.set();
       const userId = req.user.id;
       const name = req.param('name');
       const userEmail = req.param('userEmail');
@@ -279,57 +306,78 @@ export module Controllers {
       let info = {};
       let nb;
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
-      return WorkspaceService.getRecordMeta(this.config, rdmp)
-        .flatMap(response => {
-          sails.log.debug('recordMetadata');
-          recordMetadata = response;
+      let createResponse = await RecordsService.getMeta(rdmp);
+      const contactAdmin = `please contact an administrator`;
+      try {
+        if (!_.isEmpty(createResponse)) {
+          recordMetadata = createResponse.metadata;
+          sails.log.debug(`${this.logHeader} createNotebook() -> recordMetadata:`);
+          sails.log.debug(recordMetadata);
           rdmpTitle = recordMetadata['title'];
           const supervisorFromRDMP = recordMetadata['contributor_ci']['email'];
           if (supervisor === supervisorFromRDMP) {
-            return WorkspaceService.workspaceAppFromUserId(userId, this.config.appName);
-          } else {
-            Observable.throwError(new Error('Supervisor email does not match workspace'));
-          }
-          sails.log.debug(recordMetadata);
-        })
-        .flatMap(async response => {
-          sails.log.debug('workspaceAppFromUserId');
-          info = response.info;
-          sails.log.debug('userHasEmail');
-          const supervisorHasEmail = await LabarchivesService.userHasEmail(this.config.key, supervisor);
-          if (supervisorHasEmail && supervisorHasEmail['users'] && supervisorHasEmail['users']['account-for-email']['_']) {
-            sails.log.debug('createNotebook');
-            const result = await LabarchivesService.createNotebook(this.config.key, info['id'], name);
-            if (result && result.notebooks) {
-              nb = result.notebooks;
-              if (userEmail.toLowerCase() === supervisor.toLowerCase()) {
-                return Observable.of(nb);
-              } else {
-                const addUser = await LabarchivesService.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'ADMINISTRATOR');
-                sails.log.debug('addUser');
-                if (addUser) {
-                  const nbu = addUser.notebooks['notebook-user'];
-                  sails.log.debug(nbu);
-                  return Observable.of(nb);
+            const info = (await WorkspaceService.workspaceAppFromUserId(userId, this.config.appName).toPromise())?.info;
+            sails.log.debug('userHasEmail');
+            const supervisorHasEmail = await sails.services.labarchivesservice.userHasEmail(this.config.key, supervisor);
+            if (supervisorHasEmail && supervisorHasEmail['users'] && supervisorHasEmail['users']['account-for-email']['_']) {
+              sails.log.debug(`${this.logHeader} createNotebook() -> Has supervisor email, creating notebook: ${name}`);
+              const result = await sails.services.labarchivesservice.createNotebook(this.config.key, info['id'], name);
+              sails.log.verbose(`${this.logHeader} createNotebook: `);
+              sails.log.verbose(result);
+              if (result && result.notebooks) {
+                nb = result.notebooks;
+                if (userEmail.toLowerCase() === supervisor.toLowerCase()) {
+                  createResponse = {status: true, response: nb};
                 } else {
-                  Observable.throwError(new Error('Cannot add user to notebook'));
+                  const addUser = await sails.services.labarchivesservice.addUserToNotebook(this.config.key, info['id'], nb['nbid'], supervisor, 'ADMINISTRATOR');
+                  sails.log.debug('addUser');
+                  if (addUser) {
+                    const nbu = addUser.notebooks['notebook-user'];
+                    sails.log.debug(nbu);
+                    createResponse = {status: true, response: nb};
+                  } else {
+                    sails.log.error(`${this.logHeader} createNotebook() -> Cannot add user to notebook`);    
+                    createResponse = {status: false, message: 'Cannot add user to notebook, please contact an administrator.'};
+                  }
                 }
+              } else {
+                sails.log.error(`${this.logHeader} createNotebook() -> Notebook not created:`);
+                createResponse = {status: false, message: 'Failed to create notebook, please contact an administrator.'};
               }
             } else {
-              Observable.throwError(new Error('Notebook not created'));
+              const message = `Supervisor not found in LabArchives: ${supervisor}`;
+              sails.log.error(`${this.logHeader} createNotebook() -> ${message}`);
+              createResponse = {status: false, message: `${message}, ${contactAdmin}` };
             }
           } else {
-            Observable.throwError(new Error('Supervisor not on LabArchives'));
+            const message = `Supervisor email does not match workspace: ${supervisor} === ${supervisorFromRDMP}`;
+            sails.log.error(`${this.logHeader} createNotebook() -> ${message}`);  
+            createResponse = {status: false, message: `${message}, ${contactAdmin}`};
           }
-        })
-        .subscribe(response => {
-          sails.log.debug('create notebook');
+        } else {
+          const message = `RDMP Not found: ${rdmp}`;
+          sails.log.error(`${this.logHeader} createNotebook() -> ${message}`);
+          createResponse = {status: false, message: `${message}, ${contactAdmin}`};
+        }
+      } catch (err) {
+        sails.log.error(`${this.logHeader} createNotebook() -> Error thrown while processing: `);
+        sails.log.error(err);
+        createResponse = {status: false, message: err.message};
+      } 
+      // handle failure
+      try {
+        if (createResponse.status === true) {
+          sails.log.verbose(`${this.logHeader} createNotebook() -> Sending success response`)
+          sails.log.debug(JSON.stringify(createResponse));
           this.ajaxOk(req, res, null, {status: true, nb: nb['nbid'], name: name, message: 'createNotebook'});
-        }, error => {
-          sails.log.error('createNotebook: error');
-          sails.log.error(error);
-          this.ajaxFail(req, res, error.message, {status: false, message: error.message});
-        });
+        } else {
+          sails.log.error(`${this.logHeader} createNotebook() -> Sending failure response`);
+          this.ajaxFail(req, res, createResponse.message, createResponse); 
+        }
+      } catch (err) {
+        sails.log.error(`${this.logHeader} createNotebook() -> Error thrown while sending response: `);
+        sails.log.error(err);
+      }
     }
   }
 }

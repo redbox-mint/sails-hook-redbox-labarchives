@@ -1,3 +1,5 @@
+declare var sails;
+
 export class Config {
   host: string;
   recordType: string;
@@ -16,8 +18,8 @@ export class Config {
   location: string;
   description: string;
 
-  constructor(workspaces) {
-    const workspaceConfig = workspaces;
+  set() {
+    const workspaceConfig = sails.config.workspaces;
     const la = workspaceConfig.labarchives;
 
     this.host = la.host;
